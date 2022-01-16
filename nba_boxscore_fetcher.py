@@ -4,10 +4,9 @@ from datetime import datetime
 import pytz
 import streamlit as st
 
-import sys
-sys.path.insert(0, 'nba_api/nba_api/live/nba/endpoints')
-import scoreboard
-import boxscore
+$ pip install nba_api
+from nba_api.live.nba.endpoints import scoreboard
+from nba_api.live.nba.endpoints import boxscore
 
 def get_daily_player_data(date=None):
     board = scoreboard.ScoreBoard()
