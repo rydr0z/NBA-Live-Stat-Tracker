@@ -4,7 +4,6 @@ from datetime import datetime
 import pytz
 import streamlit as st
 
-$ pip install nba_api
 from nba_api.live.nba.endpoints import scoreboard
 from nba_api.live.nba.endpoints import boxscore
 
