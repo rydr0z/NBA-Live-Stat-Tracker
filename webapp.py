@@ -4,21 +4,15 @@ import time
 
 with open('frontend/css/streamlit.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
-    
-hide_dataframe_row_index = """
-            <style>
-            .row_heading.level0 {display:none}
-            </style>
-            """
-st.markdown(hide_dataframe_row_index, unsafe_allow_html=True)
 
 df = get_daily_player_data()
 df.style.hide_index()
 
-fixed_categories = ['jerseyNum', 'name', 'team','opp','minutes','score','game_clock']
+df['moment'] = df['Set']+'-'+df['Tier']+'-'+df['Series']+'-'+df['Play']
+fixed_categories = ['jerseyNum', 'team','opp', 'minutes','score','game_clock','moment','Circulation Count','Low Ask']
 stat_categories = ['points','reboundsTotal','assists','steals','blocks']
-sort_by = ['points']
-asc_list = [False]
+sort_by = ['points', 'minutes']
+asc_list = [False, False]
 
 columns = df.columns.sort_values().tolist()
 

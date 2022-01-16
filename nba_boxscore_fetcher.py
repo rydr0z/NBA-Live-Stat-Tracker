@@ -7,6 +7,16 @@ import streamlit as st
 from nba_api.live.nba.endpoints import scoreboard
 from nba_api.live.nba.endpoints import boxscore
 
+def get_topshot_data():
+    topshot_df = pd.read_csv('data/topshot_all_moments.csv')
+    return topshot_df
+
+def get_highest_circ_low_ask(topshot_df):
+    max_circ = topshot_df[['Player Name', 'Circulation Count']].groupby(['Player Name']).idxmax()
+    idx_list = max_circ['Circulation Count'].to_list()
+    high_circ_low_ask_df = topshot_df.loc[idx_list]
+    return high_circ_low_ask_df
+
 def get_daily_player_data(date=None):
     board = scoreboard.ScoreBoard()
     timezone = pytz.timezone('EST')
@@ -57,5 +67,11 @@ def get_daily_player_data(date=None):
 
         daily_stats_df = pd.concat(daily_stats)
         daily_stats_df['minutes'] = daily_stats_df['minutes'].replace('PT','',regex=True).replace('M',':',regex=True).replace('S','',regex=True)
+        
+        ts_raw_data = get_topshot_data()
+        topshot_data = get_highest_circ_low_ask(ts_raw_data)
+        topshot_data.rename(columns={'Player Name':'name'}, inplace=True)
+        topshot_data.name.astype(str)
+        daily_stats_df =daily_stats_df.set_index('name').join(topshot_data.set_index('name'), on='name')
 
-        return daily_stats_df.reset_index()
+        return daily_stats_df
