@@ -10,8 +10,8 @@ df.style.hide_index()
 
 df['moment'] = df['Set']+'-'+df['Tier']+'-'+df['Series']+'-'+df['Play']
 
-fixed_categories = ['jerseyNum']
-game_detail_categories = ['team','opp', 'minutes','score','game_clock']
+fixed_categories = ['jerseyNum', 'team','minutes']
+game_detail_categories = ['opp','score','game_clock']
 topshot_categories = ['moment','Circulation Count','Low Ask']
 stat_categories = ['points','reboundsTotal','assists','steals','blocks']
 
