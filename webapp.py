@@ -27,9 +27,8 @@ for cat in fixed_categories:
 options = st.sidebar.multiselect(
      'Which Stat Categories are you interested in?',columns,stat_categories)
 
+st.sidebar.checkbox("Click Here to Refresh")
+
 categories = fixed_categories+options+game_detail_categories+topshot_categories
 
-run_count
 st.dataframe(df[df['status']=="ACTIVE"].sort_values(sort_by, ascending=asc_list)[categories], height=1200)
-time.sleep(30)
-raise RerunException
