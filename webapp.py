@@ -1,6 +1,7 @@
 import streamlit as st
 from nba_boxscore_fetcher import *
 import time
+from streamlit.ScriptRunner import RerunException
 
 with open('frontend/css/streamlit.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
@@ -28,4 +29,7 @@ options = st.sidebar.multiselect(
 
 categories = fixed_categories+options+game_detail_categories+topshot_categories
 
+run_count
 st.dataframe(df[df['status']=="ACTIVE"].sort_values(sort_by, ascending=asc_list)[categories], height=1200)
+time.sleep(30)
+raise RerunException
