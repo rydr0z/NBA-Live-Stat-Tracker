@@ -74,6 +74,6 @@ def get_daily_player_data(date=None):
         daily_stats_df =daily_stats_df.set_index('name').join(topshot_data.set_index('name'), on='name')
         
         daily_stats_df['minutes'] = daily_stats_df['minutes'].replace('PT','',regex=True).replace('M',':',regex=True).replace('S','',regex=True)
-            daily_stats_df['Game Clock'] = daily_stats_df['Game Clock'].replace('PT','',regex=True).replace('M',':',regex=True).replace('S','',regex=True)
+        daily_stats_df['Game Clock'] = daily_stats_df['Game Clock'].replace('PT','',regex=True).replace('M',':',regex=True).replace('S','',regex=True)
 
         return daily_stats_df
