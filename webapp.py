@@ -28,4 +28,4 @@ options = st.sidebar.multiselect(
 
 categories = fixed_categories+options+game_detail_categories+topshot_categories
 
-st.dataframe(df.sort_values(sort_by, ascending=asc_list)[categories], height=1200)
+st.dataframe(df[df['status']=="Active"].sort_values(sort_by, ascending=asc_list)[categories], height=1200)
