@@ -1,7 +1,6 @@
 import streamlit as st
 from nba_boxscore_fetcher import *
 import time
-from streamlit.ScriptRunner import RerunException
 
 with open('frontend/css/streamlit.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
