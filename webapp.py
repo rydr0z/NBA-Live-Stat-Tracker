@@ -1,33 +1,88 @@
+import requests
+import pandas as pd
+from datetime import datetime
+import pytz
 import streamlit as st
-from nba_boxscore_fetcher import *
+import numpy as np
 import time
+
+from nba_boxscore_fetcher import Stat_Dataset
+
+def color_negative_red(val):
+    """
+    Takes a scalar and returns a string with
+    the css property `'color: red'` for negative
+    strings, black otherwise.
+    """
+    color = 'red' if val < 0 else 'black'
+    return 'color: %s' % color
 
 with open('frontend/css/streamlit.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
-df = get_daily_player_data()
+pd.options.display.float_format = '{:,.0f}'.format
+
+today_dataset = Stat_Dataset('data/topshot_all_moments.csv')
+df = today_dataset.gameday_df
+
 df.style.hide_index()
 
-df['moment'] = df['Set']+'-'+df['Tier']+'-'+df['Series']+'-'+df['Play']
+df['HIGHEST CIRC MOMENT'] = df['SET']+'-'+df['TIER']+'-'+df['SERIES']+'-'+df['PLAY']
+fixed_categories = ['TEAM','OPPONENT','SCORE','GAME CLOCK','MINUTES'] 
+topshot_categories = ['HIGHEST CIRC MOMENT','COUNT','LOW ASK']
 
-fixed_categories = ['jerseyNum', 'team','minutes']
-game_detail_categories = ['opp','score','game_clock']
-topshot_categories = ['moment','Circulation Count','Low Ask']
-stat_categories = ['points','reboundsTotal','assists','steals','blocks']
+columns = today_dataset.stat_categories_integer + today_dataset.stat_categories_percentages
+columns = [ x.upper() for x in columns ]
+columns.sort()
 
-sort_by = ['points', 'minutes']
-asc_list = [False, False]
-
-columns = df.columns.sort_values().tolist()
-
-for cat in fixed_categories:
-    columns.remove(cat)
-
+stat_categories = ['POINTS','REBOUNDSTOTAL','ASSISTS','STEALS','BLOCKS']
 options = st.sidebar.multiselect(
-     'Which Stat Categories are you interested in?',columns,stat_categories)
+     'Which stats are you interested in?',columns,stat_categories)
 
-st.sidebar.checkbox("Click Here to Refresh")
+add_categories = st.sidebar.multiselect(
+     'Do you want to add up any categories?',columns)
+add_categories_combined = "+".join(add_categories)
 
-categories = fixed_categories+options+game_detail_categories+topshot_categories
+sub_categories = st.sidebar.multiselect(
+    'Do you want to subtract any categories? Categories are subtracted from the first listed',columns
+)
+sub_categories_combined = "-".join(sub_categories)
 
-st.dataframe(df[df['status']=="ACTIVE"].sort_values(sort_by, ascending=asc_list)[categories], height=1200)
+st.sidebar.checkbox("Check here to use challenge settings")
+
+st.sidebar.button("Click Here to Refresh Live Data")
+if add_categories:
+    df[add_categories_combined] = 0
+
+    for cat in add_categories:
+        df[add_categories_combined] += df[cat]
+
+if sub_categories:
+    df[sub_categories_combined] = df[sub_categories[0]]
+
+    for cat in sub_categories:
+        if cat != sub_categories[0]:
+            df[sub_categories_combined] -= df[cat]
+
+if add_categories and sub_categories:
+    categories = fixed_categories+[add_categories_combined, sub_categories_combined]+options+topshot_categories
+    sort_by = [add_categories_combined, sub_categories_combined, 'MINUTES']
+    asc_list = [False, False, False]
+elif add_categories:
+    categories = fixed_categories+[add_categories_combined]+options+topshot_categories
+    sort_by = [add_categories_combined, 'MINUTES']
+    asc_list = [False, False]
+elif sub_categories:
+    categories = fixed_categories+[sub_categories_combined]+options+topshot_categories
+    sort_by = [sub_categories_combined, 'MINUTES']
+    asc_list = [False, False]
+else:
+    categories = fixed_categories+options+topshot_categories
+    sort_by = ['POINTS', 'MINUTES']
+    asc_list = [False, False]
+active_only = df['STATUS']=="ACTIVE"
+
+todays_games = pd.DataFrame(today_dataset.todays_games, index=today_dataset.start_times, columns=['Game'])
+st.write("NBA Stat Tracker for {}".format(today_dataset.game_date))
+st.table(todays_games)
+st.dataframe(df[active_only].sort_values(sort_by, ascending=asc_list)[categories], height=1200)
