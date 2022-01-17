@@ -8,6 +8,9 @@ import numpy as np
 from nba_api.live.nba.endpoints import scoreboard
 from nba_api.live.nba.endpoints import boxscore
 
+def remove_accents(a):
+    return unidecode.unidecode(a.decode('utf-8'))
+    
 class Stat_Dataset:
     
     stat_categories_integer = [
@@ -92,11 +95,12 @@ class Stat_Dataset:
                 daily_stats.append(home_df_stats)
 
         daily_stats_df = pd.concat(daily_stats)
-        
         ts_raw_data = self.topshot_df
         topshot_data = self.get_highest_circ_low_ask(ts_raw_data)
         topshot_data.rename(columns={'Player Name':'name'}, inplace=True)
+        topshot_data.name = topshot_data.name.str.normalize('NFKD').str.encode('ascii',errors='ignore').str.decode('utf-8')
         topshot_data.name.astype(str)
+
         daily_stats_df = daily_stats_df.set_index('name').join(topshot_data.set_index('name'), on='name', lsuffix='_NBA', rsuffix='_TS')
         daily_stats_df.columns = daily_stats_df.columns.str.upper()
         daily_stats_df.rename(columns={
@@ -104,7 +108,7 @@ class Stat_Dataset:
             'CIRCULATION COUNT':'COUNT'}, inplace=True)
 
         daily_stats_df['MINUTES'] = daily_stats_df['MINUTES'].replace('PT','',regex=True).replace('M',':',regex=True).replace('S','',regex=True)
-        
+
         col_list = ['COUNT', 'LOW ASK']
         for col in col_list:
             daily_stats_df[col] = daily_stats_df[col].fillna(-1)

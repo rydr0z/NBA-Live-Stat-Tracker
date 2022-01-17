@@ -48,7 +48,8 @@ sub_categories = st.sidebar.multiselect(
 )
 sub_categories_combined = "-".join(sub_categories)
 
-st.sidebar.checkbox("Check here to use challenge settings")
+challenge = st.sidebar.checkbox("Check here to use challenge settings")
+challenge_cats = ['MINUTES']
 
 st.sidebar.button("Click Here to Refresh Live Data")
 if add_categories:
@@ -81,6 +82,11 @@ else:
     sort_by = ['POINTS', 'MINUTES']
     asc_list = [False, False]
 active_only = df['STATUS']=="ACTIVE"
+
+if challenge:
+    categories = fixed_categories+topshot_categories
+    sort_by = challenge_cats
+    asc_list = [False]
 
 todays_games = pd.DataFrame(today_dataset.todays_games, index=today_dataset.start_times, columns=['Game'])
 st.write("NBA Stat Tracker for {}".format(today_dataset.game_date))
