@@ -53,6 +53,14 @@ class Stat_Dataset:
         high_circ_low_ask_df = topshot_df.loc[idx_list]
         return high_circ_low_ask_df
 
+    @st.cache
+    def get_hard_challenge_moment(self, topshot_df):
+        only_hard_df = topshot_df[(topshot_df.Tier=='Fandom') | (topshot_df.Tier=='Rare') | (topshot_df.Tier=='Legendary') | (topshot_df['Top Shot Debut'] == 1)]
+        only_hard_df = only_hard_df[['Player Name', 'Low Ask']].groupby(['Player Name']).idxmin()
+        idx_list = only_hard_df['Low Ask'].to_list()
+        hard_low_ask_df = topshot_df.loc[idx_list]
+        return hard_low_ask_df[['Player Name','Set','Tier','Series','Play','Circulation Count','Low Ask']]
+
     def get_daily_player_data(self):
         now = datetime.now(tz=pytz.timezone('EST'))
         daily_stats = []
@@ -100,19 +108,24 @@ class Stat_Dataset:
         daily_stats_df = pd.concat(daily_stats)
         ts_raw_data = self.topshot_df
         topshot_data = self.get_highest_circ_low_ask(ts_raw_data)
+        topshot_data_hard = self.get_hard_challenge_moment(ts_raw_data)
         topshot_data.rename(columns={'Player Name':'name'}, inplace=True)
+        topshot_data_hard.rename(columns={'Player Name':'name'}, inplace=True)
+
+        topshot_data = topshot_data.set_index('name').join(topshot_data_hard.set_index('name'), on='name', lsuffix='_easy', rsuffix='_hard')
+        topshot_data.reset_index(inplace=True)
         topshot_data.name = topshot_data.name.str.normalize('NFKD').str.encode('ascii',errors='ignore').str.decode('utf-8')
         topshot_data.name.astype(str)
 
         daily_stats_df = daily_stats_df.set_index('name').join(topshot_data.set_index('name'), on='name', lsuffix='_NBA', rsuffix='_TS')
         daily_stats_df.columns = daily_stats_df.columns.str.upper()
         daily_stats_df.rename(columns={
-            'TEAM_NBA':'TEAM',
-            'CIRCULATION COUNT':'COUNT'}, inplace=True)
+            'CIRCULATION COUNT_EASY':'COUNT_EASY',
+            'CIRCULATION COUNT_HARD':'COUNT_HARD'}, inplace=True)
 
         daily_stats_df['MINUTES'] = daily_stats_df['MINUTES'].replace('PT','',regex=True).replace('M',':',regex=True).replace('S','',regex=True)
 
-        col_list = ['COUNT', 'LOW ASK']
+        col_list = ['COUNT_EASY', 'LOW ASK_EASY', 'COUNT_HARD', 'LOW ASK_HARD']
         for col in col_list:
             daily_stats_df[col] = daily_stats_df[col].fillna(-1)
             daily_stats_df[col] = daily_stats_df[col].astype(int)

@@ -27,9 +27,12 @@ df = today_dataset.gameday_df
 
 df.style.hide_index()
 
-df['HIGHEST CIRC MOMENT'] = df['SET']+'-'+df['TIER']+'-'+df['SERIES']+'-'+df['PLAY']
-fixed_categories = ['TEAM','OPPONENT','SCORE','GAME CLOCK','MINUTES'] 
-topshot_categories = ['HIGHEST CIRC MOMENT','COUNT','LOW ASK']
+df['EASY MOMENT'] = df['SET_EASY']+'-'+df['TIER_EASY']+'-'+df['SERIES_EASY']+'-'+df['PLAY_EASY']
+df['HARD MOMENT'] = df['SET_HARD']+'-'+df['TIER_HARD']+'-'+df['SERIES_HARD']+'-'+df['PLAY_HARD']
+fixed_categories = ['TEAM_NBA','OPPONENT','SCORE','GAME CLOCK','MINUTES'] 
+EASY_categories = ['EASY MOMENT','COUNT_EASY','LOW ASK_EASY']
+HARD_categories = ['HARD MOMENT','COUNT_HARD','LOW ASK_HARD']
+topshot_categories = EASY_categories + HARD_categories
 
 columns = today_dataset.stat_categories_integer + today_dataset.stat_categories_percentages
 columns = [ x.upper() for x in columns ]
