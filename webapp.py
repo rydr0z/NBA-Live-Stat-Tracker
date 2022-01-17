@@ -85,6 +85,7 @@ active_only = df['STATUS']=="ACTIVE"
 
 if challenge:
     categories = fixed_categories+topshot_categories
+    options=[]
     sort_by = challenge_cats
     asc_list = [False]
 
