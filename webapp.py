@@ -90,5 +90,5 @@ if challenge:
 
 todays_games = pd.DataFrame(today_dataset.todays_games, index=today_dataset.start_times, columns=['Game'])
 st.write("NBA Stat Tracker for {}".format(today_dataset.game_date))
-st.table(todays_games)
+st.table(todays_games.sort_values(by=['Game']).sort_index())
 st.dataframe(df[active_only].sort_values(sort_by, ascending=asc_list)[categories], height=1200)
