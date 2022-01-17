@@ -55,7 +55,10 @@ class Stat_Dataset:
 
     @st.cache
     def get_hard_challenge_moment(self, topshot_df):
-        only_hard_df = topshot_df[(topshot_df.Tier=='Fandom') | (topshot_df.Tier=='Rare') | (topshot_df.Tier=='Legendary') | (topshot_df['Top Shot Debut'] == 1)]
+        only_hard_df = topshot_df[(topshot_df.Tier=='Fandom') | (topshot_df.Tier=='Rare') | (topshot_df.Tier=='Legendary')]
+        filter = ~topshot_df['Player Name'].isin(only_hard_df['Player Name'].unique())
+        top_shot_debuts = topshot_df[filter][topshot_df['Top Shot Debut'] == 1]
+        only_hard_df = pd.concat([only_hard_df, top_shot_debuts])
         only_hard_df = only_hard_df[['Player Name', 'Low Ask']].groupby(['Player Name']).idxmin()
         idx_list = only_hard_df['Low Ask'].to_list()
         hard_low_ask_df = topshot_df.loc[idx_list]
