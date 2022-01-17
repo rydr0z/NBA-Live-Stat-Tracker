@@ -27,23 +27,26 @@ class Stat_Dataset:
 
        # class variable shared by all instances
 
-    def __init__(self, topshot_data_path):
-        self.topshot_data_path = topshot_data_path
+    def __init__(self, topshot_data_url):
+        self.topshot_data_url = topshot_data_url
         self.board = scoreboard.ScoreBoard()
         self.timezone = pytz.timezone('EST')
         self.games = self.board.games.get_dict()
         self.game_date = self.board.score_board_date
 
-        self.topshot_df = self.get_topshot_data(self.topshot_data_path)
+        self.topshot_df = self.get_topshot_data(self.topshot_data_url)
         self.gameday_df, self.todays_games, self.start_times = self.get_daily_player_data()
         self.highest_circs = self.get_highest_circ_low_ask(self.topshot_df)
         
 
-
-    def get_topshot_data(self, path):
-        topshot_df = pd.read_csv(path)
+    @st.cache
+    def get_topshot_data(self, url):
+        r = requests.get(url, allow_redirects=True)
+        open('topshot_data.csv', 'wb').write(r.content)
+        topshot_df = pd.read_csv('topshot_data.csv')
         return topshot_df
 
+    @st.cache
     def get_highest_circ_low_ask(self, topshot_df):
         max_circ = topshot_df[['Player Name', 'Circulation Count']].groupby(['Player Name']).idxmax()
         idx_list = max_circ['Circulation Count'].to_list()

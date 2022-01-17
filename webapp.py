@@ -22,7 +22,7 @@ with open('frontend/css/streamlit.css') as f:
 
 pd.options.display.float_format = '{:,.0f}'.format
 
-today_dataset = Stat_Dataset('data/topshot_all_moments.csv')
+today_dataset = Stat_Dataset(topshot_data_url="https://otmnft.com/create_moments_csv/?playerName=&setName=&team=&minprice=&maxprice=&mincirc=&maxcirc=&sortby=")
 df = today_dataset.gameday_df
 
 df.style.hide_index()
