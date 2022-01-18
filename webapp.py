@@ -1,4 +1,3 @@
-from turtle import bgcolor
 import requests
 import pandas as pd
 from datetime import datetime
