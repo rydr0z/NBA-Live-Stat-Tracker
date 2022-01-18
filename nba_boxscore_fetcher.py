@@ -120,6 +120,9 @@ class Stat_Dataset:
         topshot_data.name = topshot_data.name.str.normalize('NFKD').str.encode('ascii',errors='ignore').str.decode('utf-8')
         topshot_data.name.astype(str)
 
+        topshot_data.name[topshot_data.name == "Marcus Morris"] = "Marcus Morris Sr."
+        topshot_data.name[topshot_data.name == "Enes Kanter"] = "enes Freedom"
+
         daily_stats_df = daily_stats_df.set_index('name').join(topshot_data.set_index('name'), on='name', lsuffix='_NBA', rsuffix='_TS')
         daily_stats_df.columns = daily_stats_df.columns.str.upper()
         daily_stats_df.rename(columns={

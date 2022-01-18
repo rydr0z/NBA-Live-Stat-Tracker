@@ -1,3 +1,4 @@
+from turtle import bgcolor
 import requests
 import pandas as pd
 from datetime import datetime
@@ -8,24 +9,32 @@ import time
 
 from nba_boxscore_fetcher import Stat_Dataset
 
-def color_negative_red(val):
-    """
-    Takes a scalar and returns a string with
-    the css property `'color: red'` for negative
-    strings, black otherwise.
-    """
-    color = 'red' if val < 0 else 'black'
-    return 'color: %s' % color
-
 with open('frontend/css/streamlit.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
+def get_top_x_stats(df, num, stat):
+    df_modified = df.dropna(axis=0,subset=['SET_EASY'])[[stat]]
+    if df_modified[stat].dtype == object:
+        list_largest = df_modified.sort_values(by=stat, ascending=False)[:num]
+    else:
+        list_largest = df_modified.nlargest(stat, num)
+    return list_largest
+
+stat = 'MINUTES'
 pd.options.display.float_format = '{:,.0f}'.format
 
 today_dataset = Stat_Dataset(topshot_data_url="https://otmnft.com/create_moments_csv/?playerName=&setName=&team=&minprice=&maxprice=&mincirc=&maxcirc=&sortby=")
 df = today_dataset.gameday_df
 
-df.style.hide_index()
+list_largest = get_top_x_stats(df, 10, 'MINUTES')
+st.write(list_largest[:10])
+
+def bg_color(col):
+    color = 'green'
+    return ['background-color: %s' % color 
+                if i in list_largest.index
+                else ''
+             for i,x in col.iteritems()]
 
 df['EASY MOMENT'] = df['SET_EASY']+'-'+df['TIER_EASY']+'-'+df['SERIES_EASY']+'-'+df['PLAY_EASY']
 df['HARD MOMENT'] = df['SET_HARD']+'-'+df['TIER_HARD']+'-'+df['SERIES_HARD']+'-'+df['PLAY_HARD']
@@ -33,6 +42,7 @@ fixed_categories = ['TEAM_NBA','OPPONENT','SCORE','GAME CLOCK','MINUTES']
 EASY_categories = ['EASY MOMENT','COUNT_EASY','LOW ASK_EASY']
 HARD_categories = ['HARD MOMENT','COUNT_HARD','LOW ASK_HARD']
 topshot_categories = EASY_categories + HARD_categories
+
 
 columns = today_dataset.stat_categories_integer + today_dataset.stat_categories_percentages
 columns = [ x.upper() for x in columns ]
@@ -95,4 +105,6 @@ if challenge:
 todays_games = pd.DataFrame(today_dataset.todays_games, index=today_dataset.start_times, columns=['Game'])
 st.write("NBA Stat Tracker for {}".format(today_dataset.game_date))
 st.table(todays_games.sort_values(by=['Game']).sort_index())
-st.dataframe(df[active_only].sort_values(sort_by, ascending=asc_list)[categories], height=1200)
+
+df = df[active_only].sort_values(sort_by, ascending=asc_list)[categories]
+st.dataframe(df.style.apply(bg_color), height=1200)
