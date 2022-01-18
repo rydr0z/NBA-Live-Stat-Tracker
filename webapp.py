@@ -26,7 +26,6 @@ today_dataset = Stat_Dataset(topshot_data_url="https://otmnft.com/create_moments
 df = today_dataset.gameday_df
 
 list_largest = get_top_x_stats(df, 10, 'MINUTES')
-st.write(list_largest[:10])
 
 def bg_color(col):
     color = 'green'
