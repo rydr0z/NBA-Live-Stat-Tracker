@@ -42,7 +42,7 @@ class Stat_Dataset:
         # fetching and setting up dataframes
         self.topshot_df = self.get_topshot_data(self.topshot_data_url)
         self.gameday_df, self.todays_games, self.start_times = self.get_daily_player_data()
-        self.highest_circs = self.get_highest_circ_low_ask(self.topshot_df)
+        self.cheapest_moments = self.get_cheapest_moment(self.topshot_df)
         
 
     @st.cache
@@ -67,7 +67,7 @@ class Stat_Dataset:
         return low_ask_df
 
     @st.cache
-    def get_hard_challenge_moment(self, topshot_df):
+    def get_hard_moments(self, topshot_df):
         """This function filters cheapest moment for each player in any of 
         Fandom, Rare, Legendary Tiers. If there are no moments in any of those tiers,
         it will filter the cheapest Top Shot Debut moment.
@@ -164,7 +164,7 @@ class Stat_Dataset:
         # join cheap and hard moment data with "Player Name" as the key
         ts_raw_data = self.topshot_df
         topshot_data_cheap = self.get_cheapest_moment(ts_raw_data)
-        topshot_data_hard = self.get_hard_challenge_moment(ts_raw_data)
+        topshot_data_hard = self.get_hard_moments(ts_raw_data)
 
         topshot_data_cheap.rename(columns={'Player Name':'name'}, inplace=True)
         topshot_data_hard.rename(columns={'Player Name':'name'}, inplace=True)

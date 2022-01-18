@@ -22,7 +22,7 @@ def get_top_x_stats(df, num, stat):
 stat = 'MINUTES'
 pd.options.display.float_format = '{:,.0f}'.format
 
-today_dataset = Stat_Dataset(topshot_data_url="https://otmnft.com/create_moments_csv/?playerName=&setName=&team=&minprice=&maxprice=&mincirc=&maxcirc=&sortby=")
+today_dataset = Stat_Dataset()
 df = today_dataset.gameday_df
 
 list_largest = get_top_x_stats(df, 10, 'MINUTES')
