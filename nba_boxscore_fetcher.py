@@ -214,7 +214,7 @@ class Stat_Dataset:
             ]
         ]
 
-    @st.cache
+    @st.cache(suppress_st_warning=True)
     def get_team_stats(self, team_id):
         team_player_dash = teamplayerdashboard.TeamPlayerDashboard(team_id)
         dict = team_player_dash.get_dict()
@@ -283,6 +283,7 @@ class Stat_Dataset:
         df_team.rename(columns={"PLAYER_NAME": "NAME"}, inplace=True)
         return df_team
 
+    @st.cache
     def get_daily_player_data(self):
         """
         This is the main function for retrieving and munging live data
@@ -300,9 +301,9 @@ class Stat_Dataset:
         # loop to get game information (teams, period, game clock, score and start time)
         for i, game in enumerate(self.games):
             away_df = self.get_team_stats(game["awayTeam"]["teamId"])
-            time.sleep(2)
+            time.sleep(0.3)
             home_df = self.get_team_stats(game["homeTeam"]["teamId"])
-            time.sleep(2)
+            time.sleep(0.3)
             game_id = game["gameId"]
 
             away = game["awayTeam"]["teamTricode"]
@@ -345,9 +346,9 @@ class Stat_Dataset:
                 box = boxscore.BoxScore(game_id)
 
                 away_df = pd.DataFrame(box.away_team_player_stats.get_dict())
-                time.sleep(2)
+                time.sleep(0.3)
                 home_df = pd.DataFrame(box.home_team_player_stats.get_dict())
-                time.sleep(2)
+                time.sleep(0.3)
 
                 # Store stats for away team players
                 away_df = away_df.join(

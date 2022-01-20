@@ -11,16 +11,15 @@ from nba_boxscore_fetcher import Stat_Dataset
 with open("frontend/css/streamlit.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-tiebreakers = ["DIFFERENTIAL", "PLUS_MINUS", "MIN"]
+tiebreakers = ["FGM", "DIFFERENTIAL", "PLUS_MINUS", "MIN"]
 
 
-def get_top_stats(df, num, stat):
+def get_top_stats(df, num, stat, tiebreakers):
     # sort by tiebreakers first
     # (team point differential -> plus minus -> minutes)
-    for tiebreak in tiebreakers:
-        df.sort_values(
-            tiebreak, inplace=True, ascending=False,
-        )
+    df.sort_values(
+        tiebreakers, inplace=True, ascending=False,
+    )
     df_modified = df.dropna(axis=0, subset=["SET_EASY"])[[stat]]
     if df_modified[stat].dtype == object:
         list_largest = df_modified.sort_values(by=stat, ascending=False)[:num]
@@ -29,18 +28,24 @@ def get_top_stats(df, num, stat):
     return list_largest
 
 
-stat = "PTS"
 pd.options.display.precision = 2
 
 today_dataset = Stat_Dataset()
 df = today_dataset.gameday_df
-st.write(df)
 
 
 def bg_color(col):
     color = "green"
     return [
         "background-color: %s" % color if i in list_largest.index else ""
+        for i, x in col.iteritems()
+    ]
+
+
+def bg_color2(col):
+    color = "yellow"
+    return [
+        "background-color: %s" % color if i in list_playing.index else ""
         for i, x in col.iteritems()
     ]
 
@@ -67,8 +72,6 @@ df["SCORE"] = df["OWN_SCORE"].astype(str) + "-" + df["OPP_SCORE"].astype(str)
 
 df.rename(columns={"TEAM_NBA": "TEAM"}, inplace=True)
 
-stat = ["FGA"]
-
 
 def game_clock_fn(row):
     if row["PERIOD"] != 0 and row["PERIOD"] != np.nan:
@@ -81,7 +84,9 @@ def game_clock_fn(row):
 
 df["GAME_CLOCK"] = df.apply(game_clock_fn, axis=1)
 
-list_largest = get_top_stats(df, 7, "FGA")
+list_playing = df[df["GAME_CLOCK"] != "Final"]
+
+list_largest = get_top_stats(df, 7, "FGA", tiebreakers)
 
 fixed_categories = ["OPP", "SCORE", "GAME_CLOCK", "MIN"]
 EASY_categories = ["EASY_MOMENT", "COUNT_EASY", "LOW_ASK_EASY"]
@@ -100,28 +105,40 @@ options = st.sidebar.multiselect(
     "Which stats are you interested in?", columns, challenge_cats
 )
 
-# def project_stat(row):
-#    if row["MIN_AVG"] == 0 or row["MIN_AVG"] == np.nan:
-#        df.loc[stat + "_PROJ", row.index] = 0
-#    elif row["MIN_AVG"] > row["MIN"]:
-#        df.loc[stat + "_PROJ", row.index] = row[stat] + row[stat + "_AVG"] / row[
-#            "MIN_AVG"
-#        ] * (row["MIN_AVG"] - row["MIN"])
-#    elif row["MIN_AVG"] < row["MIN"] and row["GAME_CLOCK"] != "Final":
-#        df.loc[stat + "_PROJ", row.index] = row[stat] + row[stat + "_AVG"] / row[
-#            "MIN_AVG"
-#        ] * (48 - row["GAME_CLOCK"])
-#    else:
-#        df.loc[stat + "_PROJ", row.index] = row[stat + "_AVG"]
+
+def project_stat(row):
+    clock = row["CLOCK"]
+    avg_min = row["MIN_AVG"]
+    curr_min = row["MIN"]
+    game_clock = row["GAME_CLOCK"]
+    curr_stat = row[stat]
+    avg_stat = row[stat + "_AVG"]
+    period = row["PERIOD"]
+    if clock == np.nan or clock == "" or game_clock == "Final" or type(clock) == float:
+        return row[stat]
+    elif avg_min == 0 or avg_min == np.nan:
+        return 0
+    elif float(period) < 5:
+        time = clock.split(":")
+        time = float(time[0]) + (float(time[1]) / 60)
+        return float(curr_stat) + (float(avg_stat) / 48.0) * (
+            48 - (float(period) * 12) + float(time)
+        )
+    else:
+        time = clock.split(":")
+        time = float(time[0]) + (float(time[1]) / 60)
+        return float(curr_stat) + (float(avg_stat) / 48.0) * float(time)
 
 
-# for option in options:
-#    stat = option
-#    df[stat + "_PROJ"] = 0
-#    df.apply(project_stat, axis=1)
+for option in options:
+    stat = option
+    df[stat + "_PROJ"] = 0
+    df[stat + "_PROJ"] = df.apply(project_stat, axis=1)
 
-options_proj = [x + "_AVG" for x in options]
-options_proj = list(set(options_proj) - (set(options_proj) - set(df.columns)))
+stat = ["FGA"]
+
+options_proj = [x + "_PROJ" for x in options]
+# options_proj = list(set(options_proj) - (set(options_proj) - set(df.columns)))
 
 add_categories = st.sidebar.multiselect(
     "Do you want to add up any categories?", columns
@@ -191,5 +208,5 @@ st.write("NBA Stat Tracker for {}".format(today_dataset.game_date))
 st.table(todays_games.sort_values(by=["Game"]).sort_index())
 
 df = df.sort_values(sort_by, ascending=asc_list)[categories]
+
 st.dataframe(df.style.apply(bg_color), height=1200)
-st.dataframe(df, height=1200)
