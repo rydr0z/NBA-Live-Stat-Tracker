@@ -34,6 +34,7 @@ pd.options.display.precision = 2
 
 today_dataset = Stat_Dataset()
 df = today_dataset.gameday_df
+st.write(df)
 
 
 def bg_color(col):
