@@ -300,9 +300,9 @@ class Stat_Dataset:
         # loop to get game information (teams, period, game clock, score and start time)
         for i, game in enumerate(self.games):
             away_df = self.get_team_stats(game["awayTeam"]["teamId"])
-            time.sleep(0.600)
+            time.sleep(2)
             home_df = self.get_team_stats(game["homeTeam"]["teamId"])
-            time.sleep(0.600)
+            time.sleep(2)
             game_id = game["gameId"]
 
             away = game["awayTeam"]["teamTricode"]
@@ -345,9 +345,9 @@ class Stat_Dataset:
                 box = boxscore.BoxScore(game_id)
 
                 away_df = pd.DataFrame(box.away_team_player_stats.get_dict())
-                time.sleep(0.600)
+                time.sleep(2)
                 home_df = pd.DataFrame(box.home_team_player_stats.get_dict())
-                time.sleep(0.600)
+                time.sleep(2)
 
                 # Store stats for away team players
                 away_df = away_df.join(
