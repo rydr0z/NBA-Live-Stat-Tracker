@@ -216,7 +216,13 @@ class Stat_Dataset:
 
     @st.cache(suppress_st_warning=True)
     def get_team_stats(self, team_id):
-        team_player_dash = teamplayerdashboard.TeamPlayerDashboard(team_id)
+        headers = headers = {
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.42 Safari/537.36",
+            "x-nba-stats-origin": "stats",
+        }
+        team_player_dash = teamplayerdashboard.TeamPlayerDashboard(
+            team_id, headers=headers
+        )
         dict = team_player_dash.get_dict()
         data = dict["resultSets"][1]["rowSet"]
         columns = dict["resultSets"][1]["headers"]
