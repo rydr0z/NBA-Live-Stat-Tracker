@@ -216,13 +216,8 @@ class Stat_Dataset:
 
     @st.cache(suppress_st_warning=True)
     def get_team_stats(self, team_id):
-        headers = headers = {
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.42 Safari/537.36",
-            "x-nba-stats-origin": "stats",
-        }
-        team_player_dash = teamplayerdashboard.TeamPlayerDashboard(
-            team_id, headers=headers
-        )
+        team_player_dash = teamplayerdashboard.TeamPlayerDashboard(team_id)
+        time.sleep(2)
         dict = team_player_dash.get_dict()
         data = dict["resultSets"][1]["rowSet"]
         columns = dict["resultSets"][1]["headers"]
@@ -307,9 +302,7 @@ class Stat_Dataset:
         # loop to get game information (teams, period, game clock, score and start time)
         for i, game in enumerate(self.games):
             away_df = self.get_team_stats(game["awayTeam"]["teamId"])
-            time.sleep(0.3)
             home_df = self.get_team_stats(game["homeTeam"]["teamId"])
-            time.sleep(0.3)
             game_id = game["gameId"]
 
             away = game["awayTeam"]["teamTricode"]
@@ -350,11 +343,9 @@ class Stat_Dataset:
             # If the game has already started, get the player boxscore information
             if start < now.astimezone(self.timezone):
                 box = boxscore.BoxScore(game_id)
-
+                time.sleep(2)
                 away_df = pd.DataFrame(box.away_team_player_stats.get_dict())
-                time.sleep(0.3)
                 home_df = pd.DataFrame(box.home_team_player_stats.get_dict())
-                time.sleep(0.3)
 
                 # Store stats for away team players
                 away_df = away_df.join(
