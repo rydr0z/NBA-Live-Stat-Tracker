@@ -177,12 +177,14 @@ how_many = st.sidebar.slider(
     value=num_highlighted,
     step=1,
 )
-
-sort_by = st.sidebar.selectbox(
-    "Which category do you want to sort by?",
-    sort_columns,
-    sort_columns.index(default_sort),
-)
+if today_dataset.start_times[0] < today_dataset.now:
+    sort_by = st.sidebar.selectbox(
+        "Which category do you want to sort by?",
+        sort_columns,
+        sort_columns.index(default_sort),
+    )
+else:
+    sort_by = default_sort
 
 # Button to refresh live data
 st.sidebar.button("Click Here to Refresh Live Data")
