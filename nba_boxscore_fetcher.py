@@ -11,6 +11,75 @@ from nba_api.live.nba.endpoints import boxscore
 from nba_api.stats.endpoints import teamplayerdashboard
 
 
+@st.cache(allow_output_mutation=True)
+def get_team_stats(team_id):
+    team_player_dash = teamplayerdashboard.TeamPlayerDashboard(team_id)
+    time.sleep(2)
+    dict = team_player_dash.get_dict()
+    data = dict["resultSets"][1]["rowSet"]
+    columns = dict["resultSets"][1]["headers"]
+
+    df_team = pd.DataFrame(data=data, columns=columns)
+    columns_to_avg = [
+        "MIN",
+        "FGM",
+        "FGA",
+        "FG3M",
+        "FG3A",
+        "FTM",
+        "FTA",
+        "OREB",
+        "DREB",
+        "REB",
+        "AST",
+        "TOV",
+        "STL",
+        "BLK",
+        "BLKA",
+        "PF",
+        "PFD",
+        "PTS",
+    ]
+    columns_to_drop = [
+        "GROUP_SET",
+        "NICKNAME",
+        "NBA_FANTASY_PTS",
+        "GP_RANK",
+        "W_RANK",
+        "L_RANK",
+        "W_PCT_RANK",
+        "MIN_RANK",
+        "FGM_RANK",
+        "FGA_RANK",
+        "FG_PCT_RANK",
+        "FG3M_RANK",
+        "FG3A_RANK",
+        "FG3_PCT_RANK",
+        "FTM_RANK",
+        "FTA_RANK",
+        "FT_PCT_RANK",
+        "OREB_RANK",
+        "DREB_RANK",
+        "REB_RANK",
+        "AST_RANK",
+        "TOV_RANK",
+        "STL_RANK",
+        "BLK_RANK",
+        "BLKA_RANK",
+        "PF_RANK",
+        "PFD_RANK",
+        "PTS_RANK",
+        "PLUS_MINUS_RANK",
+        "NBA_FANTASY_PTS_RANK",
+        "DD2_RANK",
+        "TD3_RANK",
+    ]
+    df_team[columns_to_avg] = df_team[columns_to_avg].div(df_team["GP"].values, axis=0)
+    df_team.drop(columns=columns_to_drop, inplace=True)
+    df_team.rename(columns={"PLAYER_NAME": "NAME"}, inplace=True)
+    return df_team
+
+
 class Stat_Dataset:
 
     # all stat categories that can be converted to int later on
@@ -112,7 +181,7 @@ class Stat_Dataset:
         "STARTER": 1,
         "STATUS": "ACTIVE",
         "STL": 1,
-        "TEAM_NBA": "LAL",
+        "TEAM": "LAL",
         "TOV": 1,
         "TSD": 1,
         "TS_HELD": 1,
@@ -214,76 +283,6 @@ class Stat_Dataset:
         ]
 
     @st.cache
-    def get_team_stats(self, team_id):
-        team_player_dash = teamplayerdashboard.TeamPlayerDashboard(team_id)
-        time.sleep(0.3)
-        dict = team_player_dash.get_dict()
-        data = dict["resultSets"][1]["rowSet"]
-        columns = dict["resultSets"][1]["headers"]
-
-        df_team = pd.DataFrame(data=data, columns=columns)
-        columns_to_avg = [
-            "MIN",
-            "FGM",
-            "FGA",
-            "FG3M",
-            "FG3A",
-            "FTM",
-            "FTA",
-            "OREB",
-            "DREB",
-            "REB",
-            "AST",
-            "TOV",
-            "STL",
-            "BLK",
-            "BLKA",
-            "PF",
-            "PFD",
-            "PTS",
-        ]
-        columns_to_drop = [
-            "GROUP_SET",
-            "NICKNAME",
-            "NBA_FANTASY_PTS",
-            "GP_RANK",
-            "W_RANK",
-            "L_RANK",
-            "W_PCT_RANK",
-            "MIN_RANK",
-            "FGM_RANK",
-            "FGA_RANK",
-            "FG_PCT_RANK",
-            "FG3M_RANK",
-            "FG3A_RANK",
-            "FG3_PCT_RANK",
-            "FTM_RANK",
-            "FTA_RANK",
-            "FT_PCT_RANK",
-            "OREB_RANK",
-            "DREB_RANK",
-            "REB_RANK",
-            "AST_RANK",
-            "TOV_RANK",
-            "STL_RANK",
-            "BLK_RANK",
-            "BLKA_RANK",
-            "PF_RANK",
-            "PFD_RANK",
-            "PTS_RANK",
-            "PLUS_MINUS_RANK",
-            "NBA_FANTASY_PTS_RANK",
-            "DD2_RANK",
-            "TD3_RANK",
-        ]
-        df_team[columns_to_avg] = df_team[columns_to_avg].div(
-            df_team["GP"].values, axis=0
-        )
-        df_team.drop(columns=columns_to_drop, inplace=True)
-        df_team.rename(columns={"PLAYER_NAME": "NAME"}, inplace=True)
-        return df_team
-
-    @st.cache
     def get_daily_player_data(self):
         """
         This is the main function for retrieving and munging live data
@@ -297,8 +296,8 @@ class Stat_Dataset:
 
         # loop to get game information (teams, period, game clock, score and start time)
         for i, game in enumerate(self.games):
-            away_df = self.get_team_stats(game["awayTeam"]["teamId"])
-            home_df = self.get_team_stats(game["homeTeam"]["teamId"])
+            away_df = get_team_stats(game["awayTeam"]["teamId"])
+            home_df = get_team_stats(game["homeTeam"]["teamId"])
             game_id = game["gameId"]
 
             away = game["awayTeam"]["teamTricode"]
@@ -339,7 +338,7 @@ class Stat_Dataset:
             # If the game has already started, get the player boxscore information
             if start < self.now.astimezone(self.timezone):
                 box = boxscore.BoxScore(game_id)
-                time.sleep(0.3)
+                time.sleep(0.2)
                 away_df = pd.DataFrame(box.away_team_player_stats.get_dict())
                 home_df = pd.DataFrame(box.home_team_player_stats.get_dict())
 

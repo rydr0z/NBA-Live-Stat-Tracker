@@ -15,11 +15,11 @@ with open("frontend/css/streamlit.css") as f:
 
 # Set defaults:
 # ---------------------------------------------------------------------
-challenge = st.sidebar.checkbox("Check here to use challenge settings", value=False)
-num_highlighted = 10
+challenge = st.sidebar.checkbox("Check here to use challenge settings", value=True)
+num_highlighted = 0
 
 # Variable columns depending on challenge
-challenge_cats = ["FGA"]
+challenge_cats = ["PTS"]
 if challenge:
     stat_categories = challenge_cats
 else:
@@ -83,6 +83,7 @@ sub_categories_combined = "-".join(sub_categories)
 
 for option in options:
     df[option + "_PROJ"] = df.apply(project_stat, stat=option, axis=1)
+
 if add_categories or sub_categories:
     df[add_categories_combined + "_PROJ"] = 0
     df[sub_categories_combined + "_PROJ"] = 0
@@ -100,6 +101,7 @@ if add_categories or sub_categories:
                 project_stat, stat=cat, axis=1
             )
 
+st.write(df)
 if add_categories_combined == "" and sub_categories_combined == "":
     options_proj = [x + "_PROJ" for x in options]
 elif add_categories_combined == "":
@@ -173,7 +175,7 @@ how_many = st.sidebar.slider(
     "Highlight the top ____ players in sorted category",
     min_value=0,
     max_value=df.shape[0],
-    value=10,
+    value=num_highlighted,
     step=1,
 )
 
@@ -198,10 +200,9 @@ st.title("NBA Stat Tracker for {}".format(today_dataset.game_date))
 st.table(todays_games.sort_values(by=["Game"]).sort_index())
 
 df = df.sort_values(sort_by, ascending=asc_list)[categories]
-df.fillna("-", inplace=True)
 
 # Options for Pandas DataFrame Style
-if df["MIN"].any() == np.nan:
-    st.dataframe(df[active_only], height=1200)
+if how_many == 0:
+    st.dataframe(df, height=1200)
 else:
-    st.dataframe(df[active_only].style.apply(bg_color, list_top=list_top), height=1200)
+    st.dataframe(df.style.apply(bg_color, list_top=list_top), height=1200)
