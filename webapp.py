@@ -11,8 +11,7 @@ from nba_boxscore_fetcher import Stat_Dataset
 
 # Custom CSS Styles and HTML
 with open("frontend/css/streamlit.css") as f:
-
-    markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 # Set defaults:
 # ---------------------------------------------------------------------
