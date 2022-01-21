@@ -11,7 +11,8 @@ from nba_boxscore_fetcher import Stat_Dataset
 
 # Custom CSS Styles and HTML
 with open("frontend/css/streamlit.css") as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
+    markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 # Set defaults:
 # ---------------------------------------------------------------------
@@ -101,7 +102,6 @@ if add_categories or sub_categories:
                 project_stat, stat=cat, axis=1
             )
 
-st.write(df)
 if add_categories_combined == "" and sub_categories_combined == "":
     options_proj = [x + "_PROJ" for x in options]
 elif add_categories_combined == "":
