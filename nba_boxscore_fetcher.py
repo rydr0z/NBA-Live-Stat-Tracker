@@ -14,7 +14,7 @@ from nba_api.stats.endpoints import teamplayerdashboard
 @st.cache(allow_output_mutation=True)
 def get_team_stats(team_id):
     team_player_dash = teamplayerdashboard.TeamPlayerDashboard(team_id)
-    time.sleep(2)
+    time.sleep(20)
     dict = team_player_dash.get_dict()
     data = dict["resultSets"][1]["rowSet"]
     columns = dict["resultSets"][1]["headers"]
