@@ -34,6 +34,7 @@ def get_team_stats(team_id):
     team_player_dash = teamplayerdashboard.TeamPlayerDashboard(
         team_id, headers=headers, timeout=100
     )
+    time.sleep(0.2)
     dict = team_player_dash.get_dict()
     data = dict["resultSets"][1]["rowSet"]
     columns = dict["resultSets"][1]["headers"]
@@ -220,7 +221,7 @@ class Stat_Dataset:
         self.topshot_data_url = topshot_data_url
         self.timezone = pytz.timezone("EST")
         # use npa_api to access live data about today's games
-        self.board = scoreboard.ScoreBoard(headers=headers)
+        self.board = scoreboard.ScoreBoard()
         self.games = self.board.games.get_dict()
         self.game_date = self.board.score_board_date
         self.now = datetime.now(tz=pytz.timezone("EST"))
@@ -356,7 +357,7 @@ class Stat_Dataset:
 
             # If the game has already started, get the player boxscore information
             if start < self.now.astimezone(self.timezone):
-                box = boxscore.BoxScore(game_id, headers=headers)
+                box = boxscore.BoxScore(game_id)
                 time.sleep(0.2)
                 away_df = pd.DataFrame(box.away_team_player_stats.get_dict())
                 home_df = pd.DataFrame(box.home_team_player_stats.get_dict())
