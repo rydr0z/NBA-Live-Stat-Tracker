@@ -16,7 +16,7 @@ with open("frontend/css/streamlit.css") as f:
 # Set defaults:
 # ---------------------------------------------------------------------
 challenge = st.sidebar.checkbox("Check here to use challenge settings", value=True)
-num_highlighted = 0
+num_highlighted = 9
 
 # Variable columns depending on challenge
 challenge_cats = ["PTS"]
@@ -29,10 +29,10 @@ else:
 fixed_categories = ["OPP", "SCORE", "GAME_CLOCK", "ONCOURT", "MIN"]
 EASY_categories = ["EASY_MOMENT", "COUNT_EASY", "LOW_ASK_EASY"]
 HARD_categories = ["HARD_MOMENT", "COUNT_HARD", "LOW_ASK_HARD"]
-topshot_categories = EASY_categories + HARD_categories
+topshot_categories = EASY_categories  # + HARD_categories
 
 # Tiebreakers for when stat of interest is tied, used in determining people with most of a stat
-tiebreakers = ["FGM", "DIFFERENTIAL", "PLUS_MINUS", "MIN"]
+tiebreakers = ["DIFFERENTIAL", "PLUS_MINUS", "MIN"]
 
 # ----------------------------------------------------------------------
 
@@ -188,7 +188,10 @@ sort_by = st.sidebar.selectbox(
 st.sidebar.button("Click Here to Refresh Live Data")
 
 list_top = get_top_stats(df, how_many, sort_by, tiebreakers)
-sort_by = [sort_by] + tiebreakers
+if today_dataset.start_times[0] < today_dataset.now:
+    sort_by = [sort_by] + tiebreakers
+else:
+    sort_by = [x + "_PROJ" for x in [sort_by]]
 asc_list = [0] * len(sort_by)
 
 todays_games = pd.DataFrame(
@@ -196,12 +199,21 @@ todays_games = pd.DataFrame(
 )
 
 st.title("NBA Stat Tracker for {}".format(today_dataset.game_date))
+todays_games.reset_index(inplace=True)
+todays_games.rename(columns={"index": "Start Time"}, inplace=True)
+todays_games["Start Time"] = todays_games["Start Time"].dt.strftime(("%r EST"))
+todays_games.set_index("Start Time", inplace=True)
+
 st.table(todays_games.sort_values(by=["Game"]).sort_index())
 
 df = df.sort_values(sort_by, ascending=asc_list)[categories]
+df = df.fillna("-")
 
 # Options for Pandas DataFrame Style
-if how_many == 0:
-    st.dataframe(df, height=1200)
+if today_dataset.start_times[0] < today_dataset.now:
+    if how_many == 0:
+        st.dataframe(df, height=1200)
+    else:
+        st.dataframe(df.style.apply(bg_color, list_top=list_top), height=1200)
 else:
-    st.dataframe(df.style.apply(bg_color, list_top=list_top), height=1200)
+    st.dataframe(df, height=1200)
