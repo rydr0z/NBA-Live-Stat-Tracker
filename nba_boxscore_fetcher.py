@@ -112,7 +112,7 @@ class Stat_Dataset:
         "STARTER": 1,
         "STATUS": "ACTIVE",
         "STL": 1,
-        "TEAM": "LAL",
+        "TEAM_NBA": "LAL",
         "TOV": 1,
         "TSD": 1,
         "TS_HELD": 1,
@@ -135,6 +135,7 @@ class Stat_Dataset:
         self.board = scoreboard.ScoreBoard()
         self.games = self.board.games.get_dict()
         self.game_date = self.board.score_board_date
+        self.now = datetime.now(tz=pytz.timezone("EST"))
 
         # fetching and setting up dataframes
         self.topshot_df = self.get_topshot_data(self.topshot_data_url)
@@ -148,12 +149,11 @@ class Stat_Dataset:
     @st.cache
     def get_topshot_data(self, url):
         # This function downloads the moment data csv and returns a dataframe
-        r = requests.get(url, allow_redirects=True)
-        open("topshot_data.csv", "wb").write(r.content)
+        # r = requests.get(url, allow_redirects=True)
+        # open("topshot_data.csv", "wb").write(r.content)
         topshot_df = pd.read_csv("topshot_data.csv")
         return topshot_df
 
-    @st.cache
     def get_cheapest_moment(self, topshot_df):
         # This function filters topshot dataframe with only cheapest moment from each player
         low_ask_filter = (
@@ -170,7 +170,6 @@ class Stat_Dataset:
 
         return low_ask_df
 
-    @st.cache
     def get_hard_moments(self, topshot_df):
         """This function filters cheapest moment for each player in any of 
         Fandom, Rare, Legendary Tiers. If there are no moments in any of those tiers,
@@ -214,10 +213,10 @@ class Stat_Dataset:
             ]
         ]
 
-    @st.cache(suppress_st_warning=True)
+    @st.cache
     def get_team_stats(self, team_id):
         team_player_dash = teamplayerdashboard.TeamPlayerDashboard(team_id)
-        time.sleep(2)
+        time.sleep(0.3)
         dict = team_player_dash.get_dict()
         data = dict["resultSets"][1]["rowSet"]
         columns = dict["resultSets"][1]["headers"]
@@ -290,9 +289,6 @@ class Stat_Dataset:
         This is the main function for retrieving and munging live data
         from nba_api requests.
         """
-
-        now = datetime.now(tz=pytz.timezone("EST"))
-
         # initilize lists for storing data
         daily_stats = []
         todays_games = []
@@ -341,9 +337,9 @@ class Stat_Dataset:
             team_stats.append(home_df)
 
             # If the game has already started, get the player boxscore information
-            if start < now.astimezone(self.timezone):
+            if start < self.now.astimezone(self.timezone):
                 box = boxscore.BoxScore(game_id)
-                time.sleep(2)
+                time.sleep(0.3)
                 away_df = pd.DataFrame(box.away_team_player_stats.get_dict())
                 home_df = pd.DataFrame(box.home_team_player_stats.get_dict())
 
@@ -381,7 +377,7 @@ class Stat_Dataset:
 
         start_times.sort()
         first_start = start_times[0]
-        if first_start < now.astimezone(self.timezone):
+        if first_start < self.now.astimezone(self.timezone):
             daily_stats_df = pd.concat(daily_stats)
             daily_stats_df.drop(
                 columns=[
@@ -567,8 +563,8 @@ class Stat_Dataset:
         daily_stats_df["DIFFERENTIAL"] = (
             daily_stats_df["OWN_SCORE"] - daily_stats_df["OPP_SCORE"]
         )
-
+        daily_stats_df.rename(columns={"TEAM_NBA": "TEAM"}, inplace=True)
         daily_stats_df.reset_index(inplace=True)
-        daily_stats_df.set_index(["NAME", "TEAM_NBA"], inplace=True)
+        daily_stats_df.set_index(["NAME", "TEAM"], inplace=True)
 
         return daily_stats_df, todays_games, start_times
