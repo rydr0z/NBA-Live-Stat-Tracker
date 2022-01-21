@@ -10,11 +10,25 @@ from nba_api.live.nba.endpoints import scoreboard
 from nba_api.live.nba.endpoints import boxscore
 from nba_api.stats.endpoints import teamplayerdashboard
 
+headers = {
+    "Connection": "keep-alive",
+    "Accept": "application/json, text/plain, */*",
+    "x-nba-stats-token": "true",
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36",
+    "x-nba-stats-origin": "stats",
+    "Sec-Fetch-Site": "same-origin",
+    "Sec-Fetch-Mode": "cors",
+    "Referer": "https://stats.nba.com/",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Accept-Language": "en-US,en;q=0.9",
+}
+
 
 @st.cache(allow_output_mutation=True)
 def get_team_stats(team_id):
-    team_player_dash = teamplayerdashboard.TeamPlayerDashboard(team_id, timeout=120)
-    time.sleep(5)
+    team_player_dash = teamplayerdashboard.TeamPlayerDashboard(
+        team_id, headers=headers, timeout=100
+    )
     dict = team_player_dash.get_dict()
     data = dict["resultSets"][1]["rowSet"]
     columns = dict["resultSets"][1]["headers"]
