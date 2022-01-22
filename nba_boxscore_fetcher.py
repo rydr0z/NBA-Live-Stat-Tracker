@@ -236,7 +236,6 @@ class Stat_Dataset:
         ) = self.get_daily_player_data()
         self.cheapest_moments = self.get_cheapest_moment(self.topshot_df)
 
-    @st.cache
     def get_topshot_data(self, url):
         # This function downloads the moment data csv and returns a dataframe
         r = requests.get(url, allow_redirects=True)

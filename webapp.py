@@ -132,6 +132,8 @@ if import_previous_days_csv == True:
     df_previous.set_index(["NAME", "TEAM"], inplace=True)
     df = pd.concat([df, df_previous])
 
+change_4h_percentage(df)
+
 # Generate Multiple categories stats depending on if addition or subtractiong
 if add_categories:
     df[add_categories_combined] = 0

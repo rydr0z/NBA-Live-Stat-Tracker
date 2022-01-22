@@ -60,7 +60,13 @@ def df_create_columns(df):
     )
     df["SCORE"] = df["OWN_SCORE"].astype(str) + "-" + df["OPP_SCORE"].astype(str)
     df["GAME_CLOCK"] = df.apply(game_clock_fn, axis=1)
+    
 
+def change_4h_percentage(df):
+    col_list = ["4HCHANGE_EASY", "4HCHANGE_HARD"]
+    for col in col_list:
+        df[col] = df[col] / 100
+        df[col] = df[col].map("{:.2%}".format)
 
 def project_stat(row, stat):
     clock = row["CLOCK"]
