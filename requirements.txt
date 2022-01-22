@@ -4,5 +4,4 @@ datetime
 pytz
 streamlit
 numpy
-time
 streamlit_autorefresh
