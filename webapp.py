@@ -8,6 +8,15 @@ import time
 from streamlit_autorefresh import st_autorefresh
 from utils import *
 from nba_boxscore_fetcher import Stat_Dataset
+import requests
+import pandas as pd
+from datetime import datetime
+import pytz
+import streamlit as st
+import numpy as np
+import time
+
+st.sidebar.image("nba_logo.png")
 
 count = st_autorefresh(interval=60000, limit=60, key="refreshapp")
 
@@ -41,15 +50,20 @@ tiebreakers = ["DIFFERENTIAL", "PLUS_MINUS", "MIN"]
 # Create dataframe that webapp will be filtering
 today_dataset = Stat_Dataset()
 df = today_dataset.gameday_df
+active_only = df["STATUS"] == "ACTIVE"
+df_for_saving = df[active_only].copy().astype(str)
+
+import_previous_days_csv = False
+previous_day_csv_path = ""
+
+if import_previous_days_csv == True:
+    df_previous = pd.read_csv(previous_day_csv_path)
+    df = pd.concat([df, df_previous])
 
 columns = df.columns
 columns = [x.upper() for x in columns if x + "_AVG" in columns]
 
 columns.sort()
-if today_dataset.start_times[0] < today_dataset.now:
-    active_only = df["STATUS"] == "ACTIVE"
-else:
-    active_only = df == df
 df_create_columns(df)
 
 
@@ -128,9 +142,6 @@ if sub_categories:
     for cat in sub_categories:
         if cat != sub_categories[0]:
             df[sub_categories_combined] -= df[cat]
-
-df_for_saving = df.copy().astype(str)
-
 
 # Deal with different cases of Multiple categories being chosen
 # --------------------------------------------------------------
@@ -221,9 +232,12 @@ st.table(todays_games.sort_values(by=["Game"]).sort_index())
 df = df.sort_values(sort_by, ascending=asc_list)[categories]
 df = df.fillna("-")
 
+dfStyler = df.style.set_properties(**{"text-align": "center"})
+dfStyler.set_table_styles([dict(selector="th", props=[("text-align", "center")])])
+
 # Options for Pandas DataFrame Style
 if count % 1 == 0 or count == 0:
-    if (df["GAME_CLOCK"] == "Final").all():
+    if (df[active_only]["GAME_CLOCK"] == "Final").all():
         df_for_saving.to_csv(
             path_or_buf="prevgamedays/"
             + datetime.now().strftime("%F")
