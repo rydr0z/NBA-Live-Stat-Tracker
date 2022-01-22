@@ -5,9 +5,11 @@ import pytz
 import streamlit as st
 import numpy as np
 import time
+from streamlit_autorefresh import st_autorefresh
 from utils import *
-
 from nba_boxscore_fetcher import Stat_Dataset
+
+count = st_autorefresh(interval=60000, limit=60, key="refreshapp")
 
 # Custom CSS Styles and HTML
 with open("frontend/css/streamlit.css") as f:
@@ -26,10 +28,10 @@ else:
     stat_categories = ["PTS", "REB", "AST", "STL", "BLK", "TOV"]
 
 # Some default columns for the dataframe
-fixed_categories = ["OPP", "SCORE", "GAME_CLOCK", "ONCOURT", "MIN"]
+fixed_categories = ["OPP", "SCORE", "GAME_CLOCK", "MIN", "ONCOURT"]
 EASY_categories = ["EASY_MOMENT", "COUNT_EASY", "LOW_ASK_EASY"]
 HARD_categories = ["HARD_MOMENT", "COUNT_HARD", "LOW_ASK_HARD"]
-topshot_categories = EASY_categories  # + HARD_categories
+topshot_categories = EASY_categories  # + ["4H_EASY"]  # + HARD_categories +
 
 # Tiebreakers for when stat of interest is tied, used in determining people with most of a stat
 tiebreakers = ["DIFFERENTIAL", "PLUS_MINUS", "MIN"]
@@ -127,6 +129,9 @@ if sub_categories:
         if cat != sub_categories[0]:
             df[sub_categories_combined] -= df[cat]
 
+df_for_saving = df.copy().astype(str)
+
+
 # Deal with different cases of Multiple categories being chosen
 # --------------------------------------------------------------
 
@@ -137,6 +142,7 @@ if add_categories and sub_categories:
         + [add_categories_combined, sub_categories_combined]
         + options
         + options_proj
+        + [x for x in tiebreakers if x != "MIN"]
         + topshot_categories
     )
     default_sort = add_categories_combined
@@ -148,6 +154,7 @@ elif add_categories:
         + [add_categories_combined]
         + options
         + options_proj
+        + [x for x in tiebreakers if x != "MIN"]
         + topshot_categories
     )
     default_sort = add_categories_combined
@@ -159,13 +166,20 @@ elif sub_categories:
         + [sub_categories_combined]
         + options
         + options_proj
+        + [x for x in tiebreakers if x != "MIN"]
         + topshot_categories
     )
     default_sort = sub_categories_combined
 
 # Multiple categories not selected
 else:
-    categories = fixed_categories + options + options_proj + topshot_categories
+    categories = (
+        fixed_categories
+        + options
+        + options_proj
+        + [x for x in tiebreakers if x != "MIN"]
+        + topshot_categories
+    )
     default_sort = options[0]
 
 sort_columns = columns + [add_categories_combined, sub_categories_combined]
@@ -177,6 +191,7 @@ how_many = st.sidebar.slider(
     value=num_highlighted,
     step=1,
 )
+
 sort_by = st.sidebar.selectbox(
     "Which category do you want to sort by?", options, options.index(default_sort),
 )
@@ -207,10 +222,18 @@ df = df.sort_values(sort_by, ascending=asc_list)[categories]
 df = df.fillna("-")
 
 # Options for Pandas DataFrame Style
-if today_dataset.start_times[0] < today_dataset.now:
-    if how_many == 0:
-        st.dataframe(df, height=1200)
+if count % 1 == 0 or count == 0:
+    if (df["GAME_CLOCK"] == "Final").all():
+        df_for_saving.to_csv(
+            path_or_buf="prevgamedays/"
+            + datetime.now().strftime("%F")
+            + "_NBAStats.csv"
+        )
+    if today_dataset.start_times[0] < today_dataset.now:
+        if how_many == 0:
+            st.dataframe(df, height=1200)
+        else:
+            st.dataframe(df.style.apply(bg_color, list_top=list_top), height=1200)
     else:
-        st.dataframe(df.style.apply(bg_color, list_top=list_top), height=1200)
-else:
-    st.dataframe(df, height=1200)
+        st.dataframe(df, height=1200)
+
