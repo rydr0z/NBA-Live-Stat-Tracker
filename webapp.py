@@ -38,8 +38,8 @@ else:
 
 # Some default columns for the dataframe
 fixed_categories = ["OPP", "SCORE", "GAME_CLOCK", "MIN", "ONCOURT"]
-EASY_categories = ["EASY_MOMENT", "COUNT_EASY", "LOW_ASK_EASY", "4H%CHANGE_EASY"]
-HARD_categories = ["HARD_MOMENT", "COUNT_HARD", "LOW_ASK_HARD", "4H%CHANGE_HARD"]
+EASY_categories = ["EASY_MOMENT", "COUNT_EASY", "LOW_ASK_EASY", "4HCHANGE_EASY"]
+HARD_categories = ["HARD_MOMENT", "COUNT_HARD", "LOW_ASK_HARD", "4HCHANGE_HARD"]
 topshot_categories = EASY_categories  # + HARD_categories +
 
 # Tiebreakers for when stat of interest is tied, used in determining people with most of a stat

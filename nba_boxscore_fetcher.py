@@ -575,8 +575,8 @@ class Stat_Dataset:
         daily_stats_df.rename(
             columns={
                 "TEAM_NBA": "TEAM",
-                "4H_EASY": "4H%CHANGE_EASY",
-                "4H_HARD": "4H%CHANGE_HARD",
+                "4H_EASY": "4HCHANGE_EASY",
+                "4H_HARD": "4HCHANGE_HARD",
             },
             inplace=True,
         )
