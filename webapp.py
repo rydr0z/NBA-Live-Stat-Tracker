@@ -38,9 +38,9 @@ else:
 
 # Some default columns for the dataframe
 fixed_categories = ["OPP", "SCORE", "GAME_CLOCK", "MIN", "ONCOURT"]
-EASY_categories = ["EASY_MOMENT", "COUNT_EASY", "LOW_ASK_EASY"]
-HARD_categories = ["HARD_MOMENT", "COUNT_HARD", "LOW_ASK_HARD"]
-topshot_categories = EASY_categories  # + ["4H_EASY"]  # + HARD_categories +
+EASY_categories = ["EASY_MOMENT", "COUNT_EASY", "LOW_ASK_EASY", "4H%CHANGE_EASY"]
+HARD_categories = ["HARD_MOMENT", "COUNT_HARD", "LOW_ASK_HARD", "4H%CHANGE_HARD"]
+topshot_categories = EASY_categories  # + HARD_categories +
 
 # Tiebreakers for when stat of interest is tied, used in determining people with most of a stat
 tiebreakers = ["DIFFERENTIAL", "PLUS_MINUS", "MIN"]
@@ -50,19 +50,11 @@ tiebreakers = ["DIFFERENTIAL", "PLUS_MINUS", "MIN"]
 # Create dataframe that webapp will be filtering
 today_dataset = Stat_Dataset()
 df = today_dataset.gameday_df
-active_only = df["STATUS"] == "ACTIVE"
-df_for_saving = df[active_only].copy().astype(str)
 
-import_previous_days_csv = False
-previous_day_csv_path = ""
-
-if import_previous_days_csv == True:
-    df_previous = pd.read_csv(previous_day_csv_path)
-    df = pd.concat([df, df_previous])
-
+import_previous_days_csv = True
+previous_day_csv_path = "prevgamedays/2022-01-21_NBAStats_edited.csv"
 columns = df.columns
-columns = [x.upper() for x in columns if x + "_AVG" in columns]
-
+columns = [x.upper() for x in columns]
 columns.sort()
 df_create_columns(df)
 
@@ -78,6 +70,8 @@ def on_court_function(row):
 
 
 df["ONCOURT"] = df.apply(on_court_function, axis=1)
+
+columns = [x for x in columns if x + "_AVG" in columns]
 
 # Create a multiselect option for individual categories and generate prediction for each option selected
 options = st.sidebar.multiselect(
@@ -128,6 +122,15 @@ else:
         add_categories_combined + "_PROJ",
         sub_categories_combined + "_PROJ",
     ]
+
+active_only = df["STATUS"] == "ACTIVE"
+df_for_saving = df[active_only].copy().astype(str)
+
+if import_previous_days_csv == True:
+    df_previous = pd.read_csv(previous_day_csv_path, dtype=df.dtypes.to_dict())
+    df_previous.fillna(0, inplace=True)
+    df_previous.set_index(["NAME", "TEAM"], inplace=True)
+    df = pd.concat([df, df_previous])
 
 # Generate Multiple categories stats depending on if addition or subtractiong
 if add_categories:
@@ -214,7 +217,7 @@ list_top = get_top_stats(df, how_many, sort_by, tiebreakers)
 if today_dataset.start_times[0] < today_dataset.now:
     sort_by = [sort_by] + tiebreakers
 else:
-    sort_by = [x + "_PROJ" for x in [sort_by]]
+    sort_by = [sort_by] + tiebreakers + [sort_by + "_PROJ"]
 asc_list = [0] * len(sort_by)
 
 todays_games = pd.DataFrame(
@@ -230,14 +233,13 @@ todays_games.set_index("Start Time", inplace=True)
 st.table(todays_games.sort_values(by=["Game"]).sort_index())
 
 df = df.sort_values(sort_by, ascending=asc_list)[categories]
-df = df.fillna("-")
 
 dfStyler = df.style.set_properties(**{"text-align": "center"})
 dfStyler.set_table_styles([dict(selector="th", props=[("text-align", "center")])])
 
 # Options for Pandas DataFrame Style
 if count % 1 == 0 or count == 0:
-    if (df[active_only]["GAME_CLOCK"] == "Final").all():
+    if (df["GAME_CLOCK"] == "Final").all():
         df_for_saving.to_csv(
             path_or_buf="prevgamedays/"
             + datetime.now().strftime("%F")

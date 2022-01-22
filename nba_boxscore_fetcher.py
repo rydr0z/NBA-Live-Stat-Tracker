@@ -5,6 +5,7 @@ import pytz
 import streamlit as st
 import numpy as np
 import time
+from utils import *
 
 from nba_api.live.nba.endpoints import scoreboard
 from nba_api.live.nba.endpoints import boxscore
@@ -299,10 +300,10 @@ class Stat_Dataset:
                 "Play",
                 "Circulation Count",
                 "Low Ask",
+                "4h",
             ]
         ]
 
-    @st.cache
     def get_daily_player_data(self):
         """
         This is the main function for retrieving and munging live data
@@ -513,7 +514,6 @@ class Stat_Dataset:
                 "Held by TS": "TS_held",
                 "Collector Score": "cs",
                 "Low Ask_easy": "Low_Ask_easy",
-                "4h": "4h",
                 "24h": "24h",
                 "7d": "7d",
                 "Listings": "Listings",
@@ -550,16 +550,6 @@ class Stat_Dataset:
         daily_stats_df.columns = daily_stats_df.columns.str.upper()
 
         # format player minutes to be more readable
-        def time_to_float(df):
-            df["MIN"] = df["MIN"].fillna("PT00M00.00S")
-            time = (
-                df["MIN"]
-                .str.replace("PT", "", regex=True)
-                .str.replace("S", "", regex=True)
-                .str.split("M", expand=True)
-            )
-            time = time.astype(float)
-            df["MIN"] = time[0] + (time[1] / 60)
 
         time_to_float(daily_stats_df)
 
@@ -582,7 +572,15 @@ class Stat_Dataset:
         daily_stats_df["DIFFERENTIAL"] = (
             daily_stats_df["OWN_SCORE"] - daily_stats_df["OPP_SCORE"]
         )
-        daily_stats_df.rename(columns={"TEAM_NBA": "TEAM"}, inplace=True)
+        daily_stats_df.rename(
+            columns={
+                "TEAM_NBA": "TEAM",
+                "4H_EASY": "4H%CHANGE_EASY",
+                "4H_HARD": "4H%CHANGE_HARD",
+            },
+            inplace=True,
+        )
+
         daily_stats_df.reset_index(inplace=True)
         daily_stats_df.set_index(["NAME", "TEAM"], inplace=True)
 

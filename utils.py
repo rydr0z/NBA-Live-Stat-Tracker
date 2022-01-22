@@ -85,3 +85,15 @@ def project_stat(row, stat):
         time = clock.split(":")
         time = float(time[0]) + (float(time[1]) / 60)
         return float(curr_stat) + (float(avg_stat) / 48.0) * float(time)
+
+
+def time_to_float(df):
+    df["MIN"] = df["MIN"].fillna("PT00M00.00S")
+    time = (
+        df["MIN"]
+        .str.replace("PT", "", regex=True)
+        .str.replace("S", "", regex=True)
+        .str.split("M", expand=True)
+    )
+    time = time.astype(float)
+    df["MIN"] = time[0] + (time[1] / 60)
