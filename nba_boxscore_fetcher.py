@@ -238,8 +238,8 @@ class Stat_Dataset:
     @st.cache
     def get_topshot_data(self, url):
         # This function downloads the moment data csv and returns a dataframe
-        # r = requests.get(url, allow_redirects=True)
-        # open("topshot_data.csv", "wb").write(r.content)
+        r = requests.get(url, allow_redirects=True)
+        open("topshot_data.csv", "wb").write(r.content)
         topshot_df = pd.read_csv("topshot_data.csv")
         return topshot_df
 
