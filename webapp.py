@@ -1,6 +1,6 @@
 import requests
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 import pytz
 import streamlit as st
 import numpy as np
@@ -52,7 +52,7 @@ today_dataset = Stat_Dataset()
 df = today_dataset.gameday_df
 
 import_previous_days_csv = True
-previous_day_csv_path = "prevgamedays/2022-01-21_NBAStats_edited.csv"
+previous_day_csv_path = "prevgamedays/2022-01-2122_NBAStats_edited.csv"
 columns = df.columns
 columns = [x.upper() for x in columns]
 columns.sort()
@@ -241,12 +241,10 @@ dfStyler.set_table_styles([dict(selector="th", props=[("text-align", "center")])
 
 # Options for Pandas DataFrame Style
 if count % 1 == 0 or count == 0:
-    if (df["GAME_CLOCK"] == "Final").all():
-        df_for_saving.to_csv(
-            path_or_buf="prevgamedays/"
-            + datetime.now().strftime("%F")
-            + "_NBAStats.csv"
-        )
+    # if datetime.now > today_dataset.start_times[-1] + timedelta(hours=3):
+    df_for_saving.to_csv(
+        path_or_buf="prevgamedays/" + datetime.now().strftime("%F") + "_NBAStats.csv"
+    )
     if today_dataset.start_times[0] < today_dataset.now:
         if how_many == 0:
             st.dataframe(df, height=1200)
