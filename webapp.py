@@ -26,7 +26,7 @@ with open("frontend/css/streamlit.css") as f:
 
 # Set defaults:
 # ---------------------------------------------------------------------
-challenge = st.sidebar.checkbox("Check here to use challenge settings", value=True)
+challenge = st.sidebar.checkbox("Check here to use challenge settings", value=False)
 num_highlighted = 9
 
 # Variable columns depending on challenge
@@ -51,7 +51,7 @@ tiebreakers = ["DIFFERENTIAL", "PLUS_MINUS", "MIN"]
 today_dataset = Stat_Dataset()
 df = today_dataset.gameday_df
 
-import_previous_days_csv = True
+import_previous_days_csv = False
 previous_day_csv_path = "prevgamedays/2022-01-2122_NBAStats_edited.csv"
 columns = df.columns
 columns = [x.upper() for x in columns]
