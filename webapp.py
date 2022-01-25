@@ -18,7 +18,7 @@ import time
 
 st.sidebar.image("nba_logo.png")
 
-count = st_autorefresh(interval=60000, limit=60, key="refreshapp")
+count = st_autorefresh(interval=60000, limit=120, key="refreshapp")
 
 # Custom CSS Styles and HTML
 with open("frontend/css/streamlit.css") as f:
@@ -246,11 +246,11 @@ if count % 1 == 0 or count == 0:
     )
     if start_times[0] < today_dataset.now:
         if how_many == 0:
-            st.dataframe(df[bench_index], height=1200)
+            st.dataframe(df[bench_index], height=700)
         else:
             st.dataframe(
-                df[bench_index].style.apply(bg_color, list_top=list_top), height=1200
+                df[bench_index].style.apply(bg_color, list_top=list_top), height=700
             )
     else:
-        st.dataframe(df[bench_index], height=1200)
+        st.dataframe(df[bench_index], height=700)
 
