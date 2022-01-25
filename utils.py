@@ -89,7 +89,7 @@ def change_4h_percentage(df):
 def project_stat(row, stat):
     clock = row["GAME_CLOCK"]
     avg_min = row["MIN_AVG"]
-    game_clock = row["GAME_CLOCK_"]
+    game_clock = row["GAME_STATUS"]
     curr_stat = row[stat]
     avg_stat = row[stat + "_AVG"]
     period = row["PERIOD"]
