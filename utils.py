@@ -18,15 +18,6 @@ def get_top_stats(df, num, stat, tiebreakers):
     return list_largest
 
 
-def game_clock_fn(row):
-    if row["GAME_STATUS"] == 0:
-        return "Final"
-    elif row["GAME_CLOCK"] == row["GAME_CLOCK"] and row["PERIOD"] == row["PERIOD"]:
-        return "Q" + str(row["PERIOD"]) + " - " + str(row["GAME_CLOCK"])
-    else:
-        return "Game Not Started"
-
-
 def bg_color(col, list_top):
     pd.options.display.precision = 2
     pd.options.display.float_format = "{:,.2f}".format
@@ -86,8 +77,6 @@ def df_create_columns(df):
 
     df["SCORE"] = df.apply(score_function, axis=1)
     df["DIFFERENTIAL"] = df.apply(differential_function, axis=1)
-
-    df["GAME_CLOCK_"] = df.apply(game_clock_fn, axis=1)
 
 
 def change_4h_percentage(df):
