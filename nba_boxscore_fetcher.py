@@ -349,7 +349,7 @@ class Stat_Dataset:
         daily_stats = []
 
         for i, row in todays_games.iterrows():
-            if row["GAME_CLOCK"] != "":
+            if row["GAME_STATUS"] != "":
                 box = boxscore.BoxScore(row["GAME_ID"])
                 time.sleep(0.2)
                 away_df = pd.DataFrame(box.away_team_player_stats.get_dict())
