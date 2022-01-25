@@ -142,75 +142,58 @@ class Stat_Dataset:
         "FG2_PCT",
     ]
 
-    expected_columns = {
-        "24H": 0,
-        "4H": 0,
-        "7D": 0,
-        "AST": 0,
-        "BLK": 0,
-        "BLKR": 0,
-        "CS": 0,
-        "DATE_MOMENT": "",
-        "DATE_UPDATED_EST": "",
-        "DREB": 0,
-        "EDITION_STATE": "",
-        "FG2A": 0,
-        "FG2M": 0,
-        "FG2_PCTNAME": 0,
-        "FG3A": 0,
-        "FG3M": 0,
-        "FG3_PCT": 0,
-        "FGA": 0,
-        "FGM": 0,
-        "FG_PCT": 0,
-        "FTA": 0,
-        "FTM": 0,
-        "FT_PCT": 0,
-        "GAME_CLOCK": "",
-        "IN_PACKS": 0,
-        "JERSEYNUM": 0,
-        "LISTINGS": 0,
-        "MIN": "PT10M01.00S",
-        "MINTED": 12,
-        "MINUS": -1,
-        "ONCOURT": 1,
-        "OPP": "",
-        "OREB": 1,
-        "OWNED": 1,
-        "PF": 1,
-        "PF_OFF": 1,
-        "PFD": 1,
-        "PF_TECH": 1,
-        "PLAYED": 1,
-        "PLAYER_ID": 1,
-        "PLAY_ID": "",
-        "PLUS": 1,
-        "PLUS_MINUS": 1,
-        "PTS_2NDCHANCE": 1,
-        "PTS_PAINT": 1,
-        "POSITION": "",
-        "PTS": 1,
-        "PTS_FASTBREAK": 1,
-        "REB": 1,
-        "ROOKIE_MINT": 1,
-        "ROOKIE_PREMIERE": 1,
-        "ROOKIE_YEAR": 1,
-        "OWN_SCORE": 1,
-        "OPP_SCORE": 1,
-        "PERIOD": 1,
-        "SET_ID": "",
-        "STARTER": 1,
-        "STATUS": "ACTIVE",
-        "STL": 1,
-        "TEAM": "LAL",
-        "TOV": 1,
-        "TSD": 1,
-        "TS_HELD": 1,
-        "TS_LINK": "",
-        "UNIQUE_OWNERS": 1,
-        "NAME": "Placeholder",
-        "Clock": "",
-    }
+    expected_columns = [
+        "status",
+        "order",
+        "personId",
+        "jerseyNum",
+        "position",
+        "starter",
+        "oncourt",
+        "played",
+        "name",
+        "nameI",
+        "firstName",
+        "familyName",
+        "notPlayingReason",
+        "notPlayingDescription",
+        "assists",
+        "blocks",
+        "blocksReceived",
+        "fieldGoalsAttempted",
+        "fieldGoalsMade",
+        "fieldGoalsPercentage",
+        "foulsOffensive",
+        "foulsDrawn",
+        "foulsPersonal",
+        "foulsTechnical",
+        "freeThrowsAttempted",
+        "freeThrowsMade",
+        "freeThrowsPercentage",
+        "minus",
+        "minutes",
+        "minutesCalculated",
+        "plus",
+        "plusMinusPoints",
+        "points",
+        "pointsFastBreak",
+        "pointsInThePaint",
+        "pointsSecondChance",
+        "reboundsDefensive",
+        "reboundsOffensive",
+        "reboundsTotal",
+        "steals",
+        "threePointersAttempted",
+        "threePointersMade",
+        "threePointersPercentage",
+        "turnovers",
+        "twoPointersAttempted",
+        "twoPointersMade",
+        "twoPointersPercentage",
+        "GAME_ID",
+        "TEAM",
+        "OPP",
+    ]
 
     otm_moment_url = "https://otmnft.com/create_moments_csv/?playerName=&setName=&team=&minprice=&maxprice=&mincirc=&maxcirc=&sortby="
 
@@ -229,11 +212,10 @@ class Stat_Dataset:
 
         # fetching and setting up dataframes
         self.topshot_df = self.get_topshot_data(self.topshot_data_url)
-        (
-            self.gameday_df,
-            self.todays_games,
-            self.start_times,
-        ) = self.get_daily_player_data()
+        self.todays_games = self.get_todays_game()
+        self.live_stats = self.get_live_stats(self.todays_games)
+        self.season_stats = self.get_season_stats(self.todays_games)
+        self.gameday_df = self.combine_data(self.todays_games)
         self.cheapest_moments = self.get_cheapest_moment(self.topshot_df)
 
     def get_topshot_data(self, url):
@@ -303,28 +285,34 @@ class Stat_Dataset:
             ]
         ]
 
-    def get_daily_player_data(self):
-        """
-        This is the main function for retrieving and munging live data
-        from nba_api requests.
-        """
+    def get_todays_game(self):
         # initilize lists for storing data
         daily_stats = []
-        todays_games = []
+        todays_games = pd.DataFrame(
+            columns=[
+                "AWAY_TEAM",
+                "AWAY_ID",
+                "HOME_TEAM",
+                "HOME_ID",
+                "PERIOD",
+                "GAME_CLOCK",
+                "AWAY_SCORE",
+                "HOME_SCORE",
+                "START_TIME",
+                "GAME_ID",
+                "GAME_STATUS",
+            ]
+        )
         start_times = []
-        team_stats = []
 
-        # loop to get game information (teams, period, game clock, score and start time)
         for i, game in enumerate(self.games):
-            away_df = get_team_stats(game["awayTeam"]["teamId"])
-            home_df = get_team_stats(game["homeTeam"]["teamId"])
+            awayId = game["awayTeam"]["teamId"]
+            homeId = game["homeTeam"]["teamId"]
+
             game_id = game["gameId"]
 
             away = game["awayTeam"]["teamTricode"]
             home = game["homeTeam"]["teamTricode"]
-
-            away_df["TEAM"] = away
-            home_df["TEAM"] = home
 
             away_score = str(game["awayTeam"]["score"])
             home_score = str(game["homeTeam"]["score"])
@@ -337,144 +325,161 @@ class Stat_Dataset:
             start = datetime.strptime(game["gameTimeUTC"], "%Y-%m-%dT%H:%M:%S%z")
             start = start.astimezone(self.timezone)
 
-            # Fill in lists to display store general game information
-            todays_games.append(
-                away
-                + " at "
-                + home
-                + " - Q"
-                + period
-                + " "
-                + game_clock
-                + " - "
-                + away_score
-                + "-"
-                + home_score
+            game_status = game["gameStatusText"]
+            todays_games = todays_games.append(
+                {
+                    "AWAY_TEAM": away,
+                    "AWAY_ID": awayId,
+                    "HOME_TEAM": home,
+                    "HOME_ID": homeId,
+                    "PERIOD": period,
+                    "GAME_CLOCK": game_clock,
+                    "AWAY_SCORE": away_score,
+                    "HOME_SCORE": home_score,
+                    "START_TIME": start,
+                    "GAME_ID": game_id,
+                    "GAME_STATUS": game_status,
+                },
+                ignore_index=True,
             )
-            start_times.append(start)
-            team_stats.append(away_df)
-            team_stats.append(home_df)
+        return todays_games.sort_values("START_TIME")
 
-            # If the game has already started, get the player boxscore information
-            if start < self.now.astimezone(self.timezone):
-                box = boxscore.BoxScore(game_id)
+    def get_live_stats(self, todays_games):
+        # initilize lists for storing data
+        daily_stats = []
+
+        for i, row in todays_games.iterrows():
+            if row["GAME_CLOCK"] != "":
+                box = boxscore.BoxScore(row["GAME_ID"])
                 time.sleep(0.2)
                 away_df = pd.DataFrame(box.away_team_player_stats.get_dict())
                 home_df = pd.DataFrame(box.home_team_player_stats.get_dict())
 
-                # Store stats for away team players
                 away_df = away_df.join(
                     pd.DataFrame((away_df.pop("statistics").values.tolist()))
                 )
-                away_df["Team"] = away
-                away_df["Opp"] = home
-                away_df["OWN_SCORE"] = away_score
-                away_df["OPP_SCORE"] = home_score
-                away_df["Clock"] = game_clock
-                if game["gameStatusText"] != "Final":
-                    away_df["Period"] = period
-                else:
-                    away_df["Period"] = 0
 
-                # Store stats for home team players
                 home_df = home_df.join(
                     pd.DataFrame((home_df.pop("statistics").values.tolist()))
                 )
-                home_df["Team"] = home
-                home_df["Opp"] = away
-                home_df["OWN_SCORE"] = home_score
-                home_df["OPP_SCORE"] = away_score
-                home_df["Clock"] = game_clock
-                if game["gameStatusText"] != "Final":
-                    home_df["Period"] = period
-                else:
-                    home_df["Period"] = 0
 
-                # store these stats in daily stats list
+                away_df["GAME_ID"] = row["GAME_ID"]
+                home_df["GAME_ID"] = row["GAME_ID"]
+
+                away_df["TEAM"] = row["AWAY_TEAM"]
+                away_df["OPP"] = row["HOME_TEAM"]
+                home_df["TEAM"] = row["HOME_TEAM"]
+                home_df["OPP"] = row["AWAY_TEAM"]
                 daily_stats.append(away_df)
                 daily_stats.append(home_df)
 
-        start_times.sort()
-        first_start = start_times[0]
-        if first_start < self.now.astimezone(self.timezone):
-            daily_stats_df = pd.concat(daily_stats)
-            daily_stats_df.drop(
-                columns=[
-                    "nameI",
-                    "firstName",
-                    "familyName",
-                    "order",
-                    "minutesCalculated",
-                ],
-                inplace=True,
-            )
-            daily_stats_df.rename(
-                columns={
-                    "assists": "ast",
-                    "blocks": "blk",
-                    "blocksReceived": "blkr",
-                    "fieldGoalsAttempted": "fga",
-                    "fieldGoalsMade": "fgm",
-                    "fieldGoalsPercentage": "fg_pct",
-                    "foulsOffensive": "PF_Off",
-                    "foulsdrawn": "PFD",
-                    "foulsPersonal": "PF",
-                    "foulsTechnical": "PF_Tech",
-                    "freeThrowsAttempted": "FTA",
-                    "freeThrowsMade": "FTM",
-                    "freeThrowsPercentage": "FT_PCT",
-                    "minus": "minus",
-                    "minutes": "min",
-                    "plus": "plus",
-                    "plusMinusPoints": "PLUS_MINUS",
-                    "points": "pts",
-                    "pointsFastBreak": "pts_fastbreak",
-                    "pointsInThePaint": "pts_paint",
-                    "pointsSecondChance": "pts_2ndchance",
-                    "reboundsDefensive": "DREB",
-                    "reboundsOffensive": "OREB",
-                    "reboundsTotal": "REB",
-                    "steals": "STL",
-                    "threePointersAttempted": "FG3A",
-                    "threePointersMade": "FG3M",
-                    "threePointersPercentage": "FG3_PCT",
-                    "turnovers": "TOV",
-                    "twoPointersAttempted": "FG2A",
-                    "twoPointersMade": "FG2M",
-                    "twoPointersPercentage": "FG2_PCT",
-                    "name": "name",
-                    "status": "status",
-                    "personId": "player_ID",
-                    "jerseyNum": "jerseyNum",
-                    "position": "position",
-                    "starter": "starter",
-                    "oncourt": "oncourt",
-                    "played": "played",
-                    "team": "team",
-                    "Opp": "OPP",
-                    "Game_Clock": "Game_Clock",
-                },
-                inplace=True,
-            )
-            daily_stats_df.columns = daily_stats_df.columns.str.upper()
-            daily_stats_df.set_index(["NAME", "TEAM"], inplace=True)
-            season_stats_df = pd.concat(team_stats)
-            season_stats_df.set_index(["NAME", "TEAM"], inplace=True)
-            daily_stats_df = season_stats_df.join(
-                daily_stats_df, on=["NAME", "TEAM"], lsuffix="_avg", rsuffix="",
-            )
-            daily_stats_df.reset_index(inplace=True)
+        return daily_stats
 
-        else:
-            daily_stats_df = pd.DataFrame(self.expected_columns, index=["NAME", "TEAM"])
-            season_stats_df = pd.concat(team_stats)
-            daily_stats_df = season_stats_df.set_index(["NAME", "TEAM"]).join(
-                daily_stats_df.set_index(["NAME", "TEAM"]),
-                on=["NAME", "TEAM"],
-                lsuffix="_avg",
-                rsuffix="",
-            )
-            daily_stats_df.reset_index(inplace=True)
+    def get_season_stats(self, todays_games):
+        team_stats = []
+
+        for i, row in todays_games.iterrows():
+            away_df = get_team_stats(row["AWAY_ID"])
+            away_df["TEAM"] = row["AWAY_TEAM"]
+            away_df["OPP"] = row["HOME_TEAM"]
+            away_df["GAME_ID"] = row["GAME_ID"]
+            away_df["AWAYORHOME"] = "away"
+            home_df = get_team_stats(row["HOME_ID"])
+            home_df["TEAM"] = row["HOME_TEAM"]
+            home_df["OPP"] = row["AWAY_TEAM"]
+            home_df["GAME_ID"] = row["GAME_ID"]
+            home_df["AWAYORHOME"] = "home"
+            team_stats.append(away_df)
+            team_stats.append(home_df)
+
+        return team_stats
+
+    def combine_data(self, todays_games):
+        """
+        This is the main function for retrieving and munging live data
+        from nba_api requests.
+        """
+        daily_stats = self.live_stats
+        team_stats = self.season_stats
+        teams_started = []
+
+        for i, row in todays_games.iterrows():
+            if row["START_TIME"] < self.now.astimezone(self.timezone):
+                teams_started.append(row["AWAY_TEAM"])
+                teams_started.append(row["HOME_TEAM"])
+
+        teams_started = set(teams_started)
+
+        # loop to get game information (teams, period, game clock, score and start time)
+        daily_stats_df = pd.DataFrame(columns=self.expected_columns)
+
+        for i, ds in enumerate(daily_stats):
+            if i == 0:
+                daily_stats_df = ds
+            else:
+                daily_stats_df = daily_stats_df.append(ds)
+
+        daily_stats_df.drop(
+            columns=["nameI", "firstName", "familyName", "order", "minutesCalculated"],
+            inplace=True,
+        )
+        daily_stats_df.rename(
+            columns={
+                "assists": "ast",
+                "blocks": "blk",
+                "blocksReceived": "blkr",
+                "fieldGoalsAttempted": "fga",
+                "fieldGoalsMade": "fgm",
+                "fieldGoalsPercentage": "fg_pct",
+                "foulsOffensive": "PF_Off",
+                "foulsdrawn": "PFD",
+                "foulsPersonal": "PF",
+                "foulsTechnical": "PF_Tech",
+                "freeThrowsAttempted": "FTA",
+                "freeThrowsMade": "FTM",
+                "freeThrowsPercentage": "FT_PCT",
+                "minus": "minus",
+                "minutes": "min",
+                "plus": "plus",
+                "plusMinusPoints": "PLUS_MINUS",
+                "points": "pts",
+                "pointsFastBreak": "pts_fastbreak",
+                "pointsInThePaint": "pts_paint",
+                "pointsSecondChance": "pts_2ndchance",
+                "reboundsDefensive": "DREB",
+                "reboundsOffensive": "OREB",
+                "reboundsTotal": "REB",
+                "steals": "STL",
+                "threePointersAttempted": "FG3A",
+                "threePointersMade": "FG3M",
+                "threePointersPercentage": "FG3_PCT",
+                "turnovers": "TOV",
+                "twoPointersAttempted": "FG2A",
+                "twoPointersMade": "FG2M",
+                "twoPointersPercentage": "FG2_PCT",
+                "name": "name",
+                "status": "status",
+                "personId": "player_ID",
+                "jerseyNum": "jerseyNum",
+                "position": "position",
+                "starter": "starter",
+                "oncourt": "oncourt",
+                "played": "played",
+                "team": "team",
+                "Opp": "OPP",
+                "Game_Clock": "Game_Clock",
+            },
+            inplace=True,
+        )
+
+        daily_stats_df.columns = daily_stats_df.columns.str.upper()
+        daily_stats_df.set_index(["NAME", "TEAM", "OPP"], inplace=True)
+        season_stats_df = pd.concat(team_stats)
+        season_stats_df.set_index(["NAME", "TEAM", "OPP"], inplace=True)
+        daily_stats_df = season_stats_df.join(
+            daily_stats_df, on=["NAME", "TEAM", "OPP"], lsuffix="_avg", rsuffix="",
+        )
+        daily_stats_df.reset_index(inplace=True)
 
         ts_raw_data = self.topshot_df
         topshot_data_cheap = self.get_cheapest_moment(ts_raw_data)
@@ -547,6 +552,10 @@ class Stat_Dataset:
         )
         # convert all column names to UPPERCASE and rename longer ones
         daily_stats_df.columns = daily_stats_df.columns.str.upper()
+        daily_stats_df.reset_index(inplace=True)
+        daily_stats_df.set_index("GAME_ID", inplace=True)
+        todays_games.set_index("GAME_ID", inplace=True)
+        daily_stats_df = daily_stats_df.join(todays_games, on="GAME_ID")
 
         # format player minutes to be more readable
 
@@ -566,11 +575,6 @@ class Stat_Dataset:
             daily_stats_df[col] = daily_stats_df[col].fillna(0)
             daily_stats_df[col] = daily_stats_df[col].astype(int)
 
-        daily_stats_df["OWN_SCORE"] = daily_stats_df["OWN_SCORE"].fillna(0).astype(int)
-        daily_stats_df["OPP_SCORE"] = daily_stats_df["OPP_SCORE"].fillna(0).astype(int)
-        daily_stats_df["DIFFERENTIAL"] = (
-            daily_stats_df["OWN_SCORE"] - daily_stats_df["OPP_SCORE"]
-        )
         daily_stats_df.rename(
             columns={
                 "TEAM_NBA": "TEAM",
@@ -581,6 +585,6 @@ class Stat_Dataset:
         )
 
         daily_stats_df.reset_index(inplace=True)
-        daily_stats_df.set_index(["NAME", "TEAM"], inplace=True)
+        daily_stats_df.set_index(["NAME", "TEAM", "OPP"], inplace=True)
 
-        return daily_stats_df, todays_games, start_times
+        return daily_stats_df

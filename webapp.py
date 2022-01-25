@@ -26,18 +26,18 @@ with open("frontend/css/streamlit.css") as f:
 
 # Set defaults:
 # ---------------------------------------------------------------------
-challenge = st.sidebar.checkbox("Check here to use challenge settings", value=False)
-num_highlighted = 9
+challenge = st.sidebar.checkbox("Check here to use challenge settings", value=True)
+num_highlighted = 5
 
 # Variable columns depending on challenge
-challenge_cats = ["PTS"]
+challenge_cats = ["PTS", "REB", "AST"]
 if challenge:
     stat_categories = challenge_cats
 else:
     stat_categories = ["PTS", "REB", "AST", "STL", "BLK", "TOV"]
 
 # Some default columns for the dataframe
-fixed_categories = ["OPP", "SCORE", "GAME_CLOCK", "MIN", "ONCOURT"]
+fixed_categories = ["SCORE", "GAME_CLOCK_", "MIN", "ONCOURT", "STARTER"]
 EASY_categories = ["EASY_MOMENT", "COUNT_EASY", "LOW_ASK_EASY", "4HCHANGE_EASY"]
 HARD_categories = ["HARD_MOMENT", "COUNT_HARD", "LOW_ASK_HARD", "4HCHANGE_HARD"]
 topshot_categories = EASY_categories  # + HARD_categories +
@@ -50,7 +50,10 @@ tiebreakers = ["DIFFERENTIAL", "PLUS_MINUS", "MIN"]
 # Create dataframe that webapp will be filtering
 today_dataset = Stat_Dataset()
 df = today_dataset.gameday_df
+todays_games = today_dataset.todays_games
+start_times = todays_games["START_TIME"].sort_values()
 
+# df = df.join(todays_games,)
 import_previous_days_csv = False
 previous_day_csv_path = "prevgamedays/2022-01-2122_NBAStats_edited.csv"
 columns = df.columns
@@ -59,17 +62,8 @@ columns.sort()
 df_create_columns(df)
 
 
-def on_court_function(row):
-    if row["PERIOD"] == 0:
-        return "-"
-    else:
-        if row["ONCOURT"] == "1":
-            return "Yes"
-        if row["ONCOURT"] == "0":
-            return "No"
-
-
 df["ONCOURT"] = df.apply(on_court_function, axis=1)
+df["STARTER"] = df.apply(starter_function, axis=1)
 
 columns = [x for x in columns if x + "_AVG" in columns]
 
@@ -80,8 +74,9 @@ options = st.sidebar.multiselect(
 
 # create a multiselect option for adding multiple categories (cat1 + cat2 + cat3...)
 add_categories = st.sidebar.multiselect(
-    "Do you want to add up any categories?", columns
+    "Do you want to add up any categories?", columns,
 )
+add_categories = challenge_cats
 add_categories_combined = "+".join(add_categories)
 
 # create multiselect option for subtracting categories (cat1 - cat2 - cat3...)
@@ -209,32 +204,44 @@ how_many = st.sidebar.slider(
 )
 
 sort_by = st.sidebar.selectbox(
-    "Which category do you want to sort by?", options, options.index(default_sort),
+    "Which category do you want to sort by?",
+    options + ["PTS+REB+AST"],
+    (options + ["PTS+REB+AST"]).index(default_sort),
 )
 
 # Button to refresh live data
 st.sidebar.button("Click Here to Refresh Live Data")
+bench_index = df["STARTER"] == "Bench"
 
-list_top = get_top_stats(df, how_many, sort_by, tiebreakers)
-if today_dataset.start_times[0] < today_dataset.now:
+list_top = get_top_stats(df[bench_index], how_many, sort_by, tiebreakers)
+
+if start_times[0] < today_dataset.now:
     sort_by = [sort_by] + tiebreakers
 else:
     sort_by = [sort_by] + tiebreakers + [sort_by + "_PROJ"]
 asc_list = [0] * len(sort_by)
 
-todays_games = pd.DataFrame(
-    today_dataset.todays_games, index=today_dataset.start_times, columns=["Game"]
-)
 
 st.title("NBA Stat Tracker for {}".format(today_dataset.game_date))
-todays_games.reset_index(inplace=True)
-todays_games.rename(columns={"index": "Start Time"}, inplace=True)
-todays_games["Start Time"] = todays_games["Start Time"].dt.strftime(("%r EST"))
-todays_games.set_index("Start Time", inplace=True)
+# todays_games["Start Time"] = todays_games["Start Time"].dt.strftime(("%r EST"))
+# todays_games.set_index("Start Time", inplace=True)
 
-st.table(todays_games.sort_values(by=["Game"]).sort_index())
+st.table(
+    todays_games[
+        [
+            "GAME_STATUS",
+            "PERIOD",
+            "GAME_CLOCK",
+            "AWAY_TEAM",
+            "AWAY_SCORE",
+            "HOME_TEAM",
+            "HOME_SCORE",
+        ]
+    ]
+)
 
 df = df.sort_values(sort_by, ascending=asc_list)[categories]
+df.fillna("-", inplace=True)
 
 dfStyler = df.style.set_properties(**{"text-align": "center"})
 dfStyler.set_table_styles([dict(selector="th", props=[("text-align", "center")])])
@@ -245,11 +252,13 @@ if count % 1 == 0 or count == 0:
     df_for_saving.to_csv(
         path_or_buf="prevgamedays/" + datetime.now().strftime("%F") + "_NBAStats.csv"
     )
-    if today_dataset.start_times[0] < today_dataset.now:
+    if start_times[0] < today_dataset.now:
         if how_many == 0:
-            st.dataframe(df, height=1200)
+            st.dataframe(df[bench_index], height=1200)
         else:
-            st.dataframe(df.style.apply(bg_color, list_top=list_top), height=1200)
+            st.dataframe(
+                df[bench_index].style.apply(bg_color, list_top=list_top), height=1200
+            )
     else:
-        st.dataframe(df, height=1200)
+        st.dataframe(df[bench_index], height=1200)
 

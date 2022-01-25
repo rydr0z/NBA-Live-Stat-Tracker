@@ -19,10 +19,10 @@ def get_top_stats(df, num, stat, tiebreakers):
 
 
 def game_clock_fn(row):
-    if row["PERIOD"] == 0:
+    if row["GAME_STATUS"] == 0:
         return "Final"
-    elif row["CLOCK"] == row["CLOCK"] and row["PERIOD"] == row["PERIOD"]:
-        return "Q" + str(row["PERIOD"]) + " - " + str(row["CLOCK"])
+    elif row["GAME_CLOCK"] == row["GAME_CLOCK"] and row["PERIOD"] == row["PERIOD"]:
+        return "Q" + str(row["PERIOD"]) + " - " + str(row["GAME_CLOCK"])
     else:
         return "Game Not Started"
 
@@ -36,6 +36,26 @@ def bg_color(col, list_top):
         "background-color: %s" % color if i in list_top.index else ""
         for i, x in col.iteritems()
     ]
+
+
+def score_function(row):
+    if row["PERIOD"] == 0:
+        return "-"
+    else:
+        if row["AWAYORHOME"] == "home":
+            return str(row["AWAY_SCORE"]) + "-" + str(row["HOME_SCORE"])
+        if row["AWAYORHOME"] == "away":
+            return str(row["HOME_SCORE"]) + "-" + str(row["AWAY_SCORE"])
+
+
+def differential_function(row):
+    if row["PERIOD"] == 0:
+        return "-"
+    else:
+        if row["AWAYORHOME"] == "home":
+            return int(row["AWAY_SCORE"]) - int(row["HOME_SCORE"])
+        if row["AWAYORHOME"] == "away":
+            return int(row["HOME_SCORE"]) - int(row["AWAY_SCORE"])
 
 
 def df_create_columns(df):
@@ -58,9 +78,17 @@ def df_create_columns(df):
         + "-"
         + df["PLAY_HARD"]
     )
-    df["SCORE"] = df["OWN_SCORE"].astype(str) + "-" + df["OPP_SCORE"].astype(str)
-    df["GAME_CLOCK"] = df.apply(game_clock_fn, axis=1)
-    
+
+    away_index = df["AWAYORHOME"] == "home"
+    home_index = df["AWAYORHOME"] == "away"
+    df["AWAY_SCORE"].fillna(0, inplace=True)
+    df["HOME_SCORE"].fillna(0, inplace=True)
+
+    df["SCORE"] = df.apply(score_function, axis=1)
+    df["DIFFERENTIAL"] = df.apply(differential_function, axis=1)
+
+    df["GAME_CLOCK_"] = df.apply(game_clock_fn, axis=1)
+
 
 def change_4h_percentage(df):
     col_list = ["4HCHANGE_EASY", "4HCHANGE_HARD"]
@@ -68,10 +96,11 @@ def change_4h_percentage(df):
         df[col] = df[col] / 100
         df[col] = df[col].map("{:.2%}".format)
 
+
 def project_stat(row, stat):
-    clock = row["CLOCK"]
+    clock = row["GAME_CLOCK"]
     avg_min = row["MIN_AVG"]
-    game_clock = row["GAME_CLOCK"]
+    game_clock = row["GAME_CLOCK_"]
     curr_stat = row[stat]
     avg_stat = row[stat + "_AVG"]
     period = row["PERIOD"]
@@ -103,3 +132,23 @@ def time_to_float(df):
     )
     time = time.astype(float)
     df["MIN"] = time[0] + (time[1] / 60)
+
+
+def on_court_function(row):
+    if row["PERIOD"] == 0:
+        return "-"
+    else:
+        if row["ONCOURT"] == "1":
+            return "On Court"
+        if row["ONCOURT"] == "0":
+            return "On Bench"
+
+
+def starter_function(row):
+    if row["PERIOD"] == 0:
+        return "-"
+    else:
+        if row["STARTER"] == "1":
+            return "Starter"
+        if row["STARTER"] == "0":
+            return "Bench"
