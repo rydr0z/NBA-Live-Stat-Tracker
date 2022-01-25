@@ -135,11 +135,11 @@ def time_to_float(df):
 
 
 def on_court_function(row):
-    if row["PERIOD"] == 0:
+    if row["PERIOD"] == 0 or row["GAME_STATUS"] == "Final":
         return "-"
     else:
         if row["ONCOURT"] == "1":
-            return "In Play"
+            return "In Game"
         if row["ONCOURT"] == "0":
             return "On Bench"
 

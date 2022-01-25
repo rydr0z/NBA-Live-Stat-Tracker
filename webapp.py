@@ -227,16 +227,8 @@ st.title("NBA Stat Tracker for {}".format(today_dataset.game_date))
 # todays_games.set_index("Start Time", inplace=True)
 
 st.table(
-    todays_games[
-        [
-            "GAME_STATUS",
-            "PERIOD",
-            "GAME_CLOCK",
-            "AWAY_TEAM",
-            "AWAY_SCORE",
-            "HOME_TEAM",
-            "HOME_SCORE",
-        ]
+    todays_games.reset_index()[
+        ["GAME_STATUS", "AWAY_TEAM", "AWAY_SCORE", "HOME_TEAM", "HOME_SCORE",]
     ]
 )
 
