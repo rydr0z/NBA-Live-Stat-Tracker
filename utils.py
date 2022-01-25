@@ -139,7 +139,7 @@ def on_court_function(row):
         return "-"
     else:
         if row["ONCOURT"] == "1":
-            return "On Court"
+            return "In Play"
         if row["ONCOURT"] == "0":
             return "On Bench"
 
