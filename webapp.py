@@ -15,6 +15,8 @@ import pytz
 import streamlit as st
 import numpy as np
 import time
+import pickle
+from os.path import exists
 
 st.sidebar.image("nba_logo.png")
 
@@ -27,20 +29,20 @@ with open("frontend/css/streamlit.css") as f:
 # Set defaults:
 # ---------------------------------------------------------------------
 challenge = st.sidebar.checkbox("Check here to use challenge settings", value=True)
-num_highlighted = 5
+num_highlighted = 10
 
 # Variable columns depending on challenge
-challenge_cats = ["PTS", "REB", "AST"]
+challenge_cats = ["FTM"]
 if challenge:
     stat_categories = challenge_cats
 else:
     stat_categories = ["PTS", "REB", "AST", "STL", "BLK", "TOV"]
 
 # Some default columns for the dataframe
-fixed_categories = ["SCORE", "GAME_STATUS", "MIN", "ONCOURT", "STARTER"]
+fixed_categories = ["SCORE", "GAME_STATUS", "MIN", "ONCOURT"]
 EASY_categories = ["EASY_MOMENT", "COUNT_EASY", "LOW_ASK_EASY", "4HCHANGE_EASY"]
 HARD_categories = ["HARD_MOMENT", "COUNT_HARD", "LOW_ASK_HARD", "4HCHANGE_HARD"]
-topshot_categories = EASY_categories  # + HARD_categories +
+topshot_categories = EASY_categories + HARD_categories
 
 # Tiebreakers for when stat of interest is tied, used in determining people with most of a stat
 tiebreakers = ["DIFFERENTIAL", "PLUS_MINUS", "MIN"]
@@ -51,7 +53,7 @@ tiebreakers = ["DIFFERENTIAL", "PLUS_MINUS", "MIN"]
 today_dataset = Stat_Dataset()
 df = today_dataset.gameday_df
 todays_games = today_dataset.todays_games
-start_times = todays_games["START_TIME"].sort_values()
+start_times = todays_games["START_TIME"].to_list()
 
 # df = df.join(todays_games,)
 import_previous_days_csv = False
@@ -76,7 +78,6 @@ options = st.sidebar.multiselect(
 add_categories = st.sidebar.multiselect(
     "Do you want to add up any categories?", columns,
 )
-add_categories = challenge_cats
 add_categories_combined = "+".join(add_categories)
 
 # create multiselect option for subtracting categories (cat1 - cat2 - cat3...)
@@ -215,6 +216,7 @@ bench_index = (df["STARTER"] != "Starter") & (df["STATUS"] != "INACTIVE")
 
 list_top = get_top_stats(df[bench_index], how_many, sort_by, tiebreakers)
 
+
 if start_times[0] < today_dataset.now:
     sort_by = [sort_by] + tiebreakers
 else:
@@ -246,11 +248,9 @@ if count % 1 == 0 or count == 0:
     )
     if start_times[0] < today_dataset.now:
         if how_many == 0:
-            st.dataframe(df[bench_index], height=700)
+            st.dataframe(df, height=700)
         else:
-            st.dataframe(
-                df[bench_index].style.apply(bg_color, list_top=list_top), height=700
-            )
+            st.dataframe(df.style.apply(bg_color, list_top=list_top), height=700)
     else:
-        st.dataframe(df[bench_index], height=700)
+        st.dataframe(df, height=700)
 

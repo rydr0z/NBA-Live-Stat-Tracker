@@ -142,58 +142,58 @@ class Stat_Dataset:
         "FG2_PCT",
     ]
 
-    expected_columns = [
-        "status",
-        "order",
-        "personId",
-        "jerseyNum",
-        "position",
-        "starter",
-        "oncourt",
-        "played",
-        "name",
-        "nameI",
-        "firstName",
-        "familyName",
-        "notPlayingReason",
-        "notPlayingDescription",
-        "assists",
-        "blocks",
-        "blocksReceived",
-        "fieldGoalsAttempted",
-        "fieldGoalsMade",
-        "fieldGoalsPercentage",
-        "foulsOffensive",
-        "foulsDrawn",
-        "foulsPersonal",
-        "foulsTechnical",
-        "freeThrowsAttempted",
-        "freeThrowsMade",
-        "freeThrowsPercentage",
-        "minus",
-        "minutes",
-        "minutesCalculated",
-        "plus",
-        "plusMinusPoints",
-        "points",
-        "pointsFastBreak",
-        "pointsInThePaint",
-        "pointsSecondChance",
-        "reboundsDefensive",
-        "reboundsOffensive",
-        "reboundsTotal",
-        "steals",
-        "threePointersAttempted",
-        "threePointersMade",
-        "threePointersPercentage",
-        "turnovers",
-        "twoPointersAttempted",
-        "twoPointersMade",
-        "twoPointersPercentage",
-        "GAME_ID",
-        "TEAM",
-        "OPP",
-    ]
+    expected_columns = {
+        "status": "ACTIVE",
+        "order": 1,
+        "personId": 1,
+        "jerseyNum": 1,
+        "position": "PG",
+        "starter": 1,
+        "oncourt": 1,
+        "played": 1,
+        "name": "name",
+        "nameI": "nameI",
+        "firstName": "firstName",
+        "familyName": "familyName",
+        "notPlayingReason": "notPlayingReason",
+        "notPlayingDescription": "notPlayingDescription",
+        "assists": 1,
+        "blocks": 1,
+        "blocksReceived": 1,
+        "fieldGoalsAttempted": 1,
+        "fieldGoalsMade": 1,
+        "fieldGoalsPercentage": 1.0,
+        "foulsOffensive": 1,
+        "foulsDrawn": 1,
+        "foulsPersonal": 1,
+        "foulsTechnical": 1,
+        "freeThrowsAttempted": 1,
+        "freeThrowsMade": 1,
+        "freeThrowsPercentage": 1,
+        "minus": -1,
+        "minutes": "PT01M01.01S",
+        "minutesCalculated": "PT01M01.01S",
+        "plus": 1,
+        "plusMinusPoints": 1,
+        "points": 1,
+        "pointsFastBreak": 1,
+        "pointsInThePaint": 1,
+        "pointsSecondChance": 1,
+        "reboundsDefensive": 1,
+        "reboundsOffensive": 1,
+        "reboundsTotal": 1,
+        "steals": 1,
+        "threePointersAttempted": 1,
+        "threePointersMade": 1,
+        "threePointersPercentage": 1.0,
+        "turnovers": 1,
+        "twoPointersAttempted": 1,
+        "twoPointersMade": 1,
+        "twoPointersPercentage": 1.0,
+        "GAME_ID": 1.0,
+        "TEAM": "team",
+        "OPP": "opp",
+    }
 
     otm_moment_url = "https://otmnft.com/create_moments_csv/?playerName=&setName=&team=&minprice=&maxprice=&mincirc=&maxcirc=&sortby="
 
@@ -347,9 +347,8 @@ class Stat_Dataset:
     def get_live_stats(self, todays_games):
         # initilize lists for storing data
         daily_stats = []
-
         for i, row in todays_games.iterrows():
-            if row["GAME_STATUS"] != "":
+            if row["GAME_CLOCK"] != "":
                 box = boxscore.BoxScore(row["GAME_ID"])
                 time.sleep(0.2)
                 away_df = pd.DataFrame(box.away_team_player_stats.get_dict())
@@ -411,13 +410,14 @@ class Stat_Dataset:
         teams_started = set(teams_started)
 
         # loop to get game information (teams, period, game clock, score and start time)
-        daily_stats_df = pd.DataFrame(columns=self.expected_columns)
+        daily_stats_df = pd.DataFrame(self.expected_columns, index=[0])
 
-        for i, ds in enumerate(daily_stats):
-            if i == 0:
-                daily_stats_df = ds
-            else:
-                daily_stats_df = daily_stats_df.append(ds)
+        if daily_stats:
+            for i, ds in enumerate(daily_stats):
+                if i == 0:
+                    daily_stats_df = ds
+                else:
+                    daily_stats_df = daily_stats_df.append(ds)
 
         daily_stats_df.drop(
             columns=["nameI", "firstName", "familyName", "order", "minutesCalculated"],
@@ -554,6 +554,7 @@ class Stat_Dataset:
         daily_stats_df.columns = daily_stats_df.columns.str.upper()
         daily_stats_df.reset_index(inplace=True)
         daily_stats_df.set_index("GAME_ID", inplace=True)
+        todays_games["GAME_ID"] = todays_games["GAME_ID"].astype(float)
         todays_games.set_index("GAME_ID", inplace=True)
         daily_stats_df = daily_stats_df.join(todays_games, on="GAME_ID")
 

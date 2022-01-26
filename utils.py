@@ -17,7 +17,6 @@ def get_top_stats(df, num, stat, tiebreakers):
         list_largest = df_modified.nlargest(num, stat)
     return list_largest
 
-
 def bg_color(col, list_top):
     pd.options.display.precision = 2
     pd.options.display.float_format = "{:,.2f}".format
