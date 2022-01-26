@@ -253,22 +253,24 @@ class Stat_Dataset:
 
         # Get only moments in desired tiers
         filter_tiers = (
-            (topshot_df.Tier == "Fandom")
-            | (topshot_df.Tier == "Rare")
+            (topshot_df.Tier == "Rare")
             | (topshot_df.Tier == "Legendary")
+            | (topshot_df["Top Shot Debut"] == 1)
         )
         only_tiers_df = topshot_df[filter_tiers]
 
         # Get TSD moments any players not in tier
-        filter_not_tiers = ~topshot_df["Player Name"].isin(
-            only_tiers_df["Player Name"].unique()
-        )
-        filter_tsd = topshot_df["Top Shot Debut"] == 1
-        top_shot_debuts = topshot_df[filter_not_tiers][filter_tsd]
+        # filter_not_tiers = ~topshot_df["Player Name"].isin(
+        #    only_tiers_df["Player Name"].unique()
+        # )
+        # filter_tsd = topshot_df["Top Shot Debut"] == 1
+        # top_shot_debuts = topshot_df[filter_not_tiers][filter_tsd]
 
         # Combine the two filtered dataframes and get indices of lowest ask moments
-        hard_df = pd.concat([only_tiers_df, top_shot_debuts])
-        hard_df = hard_df[["Player Name", "Low Ask"]].groupby(["Player Name"]).idxmin()
+        # hard_df = pd.concat([only_tiers_df, top_shot_debuts])
+        hard_df = (
+            only_tiers_df[["Player Name", "Low Ask"]].groupby(["Player Name"]).idxmin()
+        )
         idx_list = hard_df["Low Ask"].to_list()
         hard_df = topshot_df.loc[idx_list]
 
