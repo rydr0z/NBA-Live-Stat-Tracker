@@ -37,7 +37,7 @@ def get_todays_games():
         # Convert start time from UTC to EST timezone
         start = datetime.strptime(game["gameTimeUTC"], "%Y-%m-%dT%H:%M:%S%z")
         start = start.astimezone(Today.TIMEZONE)
-        date = start.strftime("%B %m, %Y")
+        date = start.strftime("%B %d, %Y")
 
         game_status = game["gameStatusText"]
 
