@@ -10,12 +10,13 @@ def get_top_stats(df, num, stat, tiebreakers):
     df.sort_values(
         tiebreakers, inplace=True, ascending=False,
     )
-    df_modified = df.dropna(axis=0, subset=["SET_EASY"])[[stat]]
+    df_modified = df.dropna(axis=0, subset=["set_easy"])[[stat]]
     if df_modified[stat].dtype == object:
         list_largest = df_modified.sort_values(by=stat, ascending=False)[:num]
     else:
         list_largest = df_modified.nlargest(num, stat)
     return list_largest
+
 
 def bg_color(col, list_top):
     pd.options.display.precision = 2
@@ -29,70 +30,70 @@ def bg_color(col, list_top):
 
 
 def score_function(row):
-    if row["PERIOD"] == 0:
+    if row["period"] == 0:
         return "-"
     else:
-        if row["AWAYORHOME"] == "home":
-            return str(row["AWAY_SCORE"]) + "-" + str(row["HOME_SCORE"])
-        if row["AWAYORHOME"] == "away":
-            return str(row["HOME_SCORE"]) + "-" + str(row["AWAY_SCORE"])
+        if row["awayorhome"] == "home":
+            return str(row["away_score"]) + "-" + str(row["home_score"])
+        if row["awayorhome"] == "away":
+            return str(row["home_score"]) + "-" + str(row["away_score"])
 
 
 def differential_function(row):
-    if row["PERIOD"] == 0:
+    if row["period"] == 0:
         return "-"
     else:
-        if row["AWAYORHOME"] == "home":
-            return int(row["AWAY_SCORE"]) - int(row["HOME_SCORE"])
-        if row["AWAYORHOME"] == "away":
-            return int(row["HOME_SCORE"]) - int(row["AWAY_SCORE"])
+        if row["awayorhome"] == "home":
+            return int(row["away_score"]) - int(row["home_score"])
+        if row["awayorhome"] == "away":
+            return int(row["home_score"]) - int(row["away_score"])
 
 
 def df_create_columns(df):
 
-    df["EASY_MOMENT"] = (
-        df["SET_EASY"]
+    df["easy_moment"] = (
+        df["set_easy"]
         + "-"
-        + df["TIER_EASY"]
+        + df["tier_easy"]
         + "-"
-        + df["SERIES_EASY"]
+        + df["series_easy"]
         + "-"
-        + df["PLAY_EASY"]
+        + df["play_easy"]
     )
-    df["HARD_MOMENT"] = (
-        df["SET_HARD"]
+    df["hard_moment"] = (
+        df["set_hard"]
         + "-"
-        + df["TIER_HARD"]
+        + df["tier_hard"]
         + "-"
-        + df["SERIES_HARD"]
+        + df["series_hard"]
         + "-"
-        + df["PLAY_HARD"]
+        + df["play_hard"]
     )
 
-    away_index = df["AWAYORHOME"] == "home"
-    home_index = df["AWAYORHOME"] == "away"
-    df["AWAY_SCORE"].fillna(0, inplace=True)
-    df["HOME_SCORE"].fillna(0, inplace=True)
+    away_index = df["awayorhome"] == "home"
+    home_index = df["awayorhome"] == "away"
+    df["away_score"].fillna(0, inplace=True)
+    df["home_score"].fillna(0, inplace=True)
 
-    df["SCORE"] = df.apply(score_function, axis=1)
-    df["DIFFERENTIAL"] = df.apply(differential_function, axis=1)
+    df["score"] = df.apply(score_function, axis=1)
+    df["differential"] = df.apply(differential_function, axis=1)
 
 
 def change_4h_percentage(df):
-    col_list = ["4HCHANGE_EASY", "4HCHANGE_HARD"]
+    col_list = ["4hchange_easy", "4hchange_hard"]
     for col in col_list:
         df[col] = df[col] / 100
         df[col] = df[col].map("{:.2%}".format)
 
 
 def project_stat(row, stat):
-    clock = row["GAME_CLOCK"]
-    avg_min = row["MIN_AVG"]
-    game_clock = row["GAME_STATUS"]
+    clock = row["game_clock"]
+    avg_min = row["min_avg"]
+    game_clock = row["game_status"]
     curr_stat = row[stat]
-    avg_stat = row[stat + "_AVG"]
-    period = row["PERIOD"]
-    if clock == np.nan or type(clock) == float:
+    avg_stat = row[stat + "_avg"]
+    period = row["period"]
+    if clock == "" or clock == np.nan or type(clock) == float:
         return avg_stat
     elif game_clock == "Final" or period == 0 or clock == "":
         return curr_stat
@@ -110,33 +111,21 @@ def project_stat(row, stat):
         return float(curr_stat) + (float(avg_stat) / 48.0) * float(time)
 
 
-def time_to_float(df):
-    df["MIN"] = df["MIN"].fillna("PT00M00.00S")
-    time = (
-        df["MIN"]
-        .str.replace("PT", "", regex=True)
-        .str.replace("S", "", regex=True)
-        .str.split("M", expand=True)
-    )
-    time = time.astype(float)
-    df["MIN"] = time[0] + (time[1] / 60)
-
-
 def on_court_function(row):
-    if row["PERIOD"] == 0 or row["GAME_STATUS"] == "Final":
+    if row["period"] == 0 or row["game_status"] == "Final":
         return "-"
     else:
-        if row["ONCOURT"] == "1":
+        if row["on_court"] == "1":
             return "In Game"
-        if row["ONCOURT"] == "0":
+        if row["on_court"] == "0":
             return "On Bench"
 
 
 def starter_function(row):
-    if row["PERIOD"] == 0:
+    if row["period"] == 0:
         return "-"
     else:
-        if row["STARTER"] == "1":
+        if row["starter"] == "1":
             return "Starter"
-        if row["STARTER"] == "0":
+        if row["starter"] == "0":
             return "Bench"

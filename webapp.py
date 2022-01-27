@@ -7,7 +7,7 @@ import numpy as np
 import time
 from streamlit_autorefresh import st_autorefresh
 from utils import *
-from nba_boxscore_fetcher import Stat_Dataset
+from data_combine.combinedata import CombinedStats
 import requests
 import pandas as pd
 from datetime import datetime
@@ -32,42 +32,40 @@ challenge = st.sidebar.checkbox("Check here to use challenge settings", value=Tr
 num_highlighted = 10
 
 # Variable columns depending on challenge
-challenge_cats = ["FTM"]
+challenge_cats = ["ftm"]
 if challenge:
     stat_categories = challenge_cats
 else:
-    stat_categories = ["PTS", "REB", "AST", "STL", "BLK", "TOV"]
+    stat_categories = ["pts", "reb", "ast", "stl", "blk", "tov"]
 
 # Some default columns for the dataframe
-fixed_categories = ["SCORE", "GAME_STATUS", "MIN", "ONCOURT"]
-EASY_categories = ["EASY_MOMENT", "COUNT_EASY", "LOW_ASK_EASY", "4HCHANGE_EASY"]
-HARD_categories = ["HARD_MOMENT", "COUNT_HARD", "LOW_ASK_HARD", "4HCHANGE_HARD"]
+fixed_categories = ["score", "game_status", "min", "on_court"]
+EASY_categories = ["easy_moment", "count_easy", "low_ask_easy", "4hchange_easy"]
+HARD_categories = ["hard_moment", "count_hard", "low_ask_hard", "4hchange_hard"]
 topshot_categories = EASY_categories + HARD_categories
 
 # Tiebreakers for when stat of interest is tied, used in determining people with most of a stat
-tiebreakers = ["DIFFERENTIAL", "PLUS_MINUS", "MIN"]
+tiebreakers = ["differential", "plus_minus", "min"]
 
 # ----------------------------------------------------------------------
 
 # Create dataframe that webapp will be filtering
-today_dataset = Stat_Dataset()
-df = today_dataset.gameday_df
+today_dataset = CombinedStats()
+df = today_dataset.stats
 todays_games = today_dataset.todays_games
-start_times = todays_games["START_TIME"].to_list()
+start_times = todays_games["start_time"].to_list()
 
 # df = df.join(todays_games,)
 import_previous_days_csv = False
 previous_day_csv_path = "prevgamedays/2022-01-2122_NBAStats_edited.csv"
 columns = df.columns
-columns = [x.upper() for x in columns]
-columns.sort()
+columns = columns.sort_values()
 df_create_columns(df)
 
+df["on_court"] = df.apply(on_court_function, axis=1)
+df["starter"] = df.apply(starter_function, axis=1)
 
-df["ONCOURT"] = df.apply(on_court_function, axis=1)
-df["STARTER"] = df.apply(starter_function, axis=1)
-
-columns = [x for x in columns if x + "_AVG" in columns]
+columns = [x for x in columns if x + "_avg" in columns]
 
 # Create a multiselect option for individual categories and generate prediction for each option selected
 options = st.sidebar.multiselect(
@@ -86,46 +84,45 @@ sub_categories = st.sidebar.multiselect(
     columns,
 )
 sub_categories_combined = "-".join(sub_categories)
-
 for option in options:
-    df[option + "_PROJ"] = df.apply(project_stat, stat=option, axis=1)
+    df[option + "_proj"] = df.apply(project_stat, stat=option, axis=1)
 
 if add_categories or sub_categories:
-    df[add_categories_combined + "_PROJ"] = 0
-    df[sub_categories_combined + "_PROJ"] = 0
+    df[add_categories_combined + "_proj"] = 0
+    df[sub_categories_combined + "_proj"] = 0
     for cat in add_categories:
-        df[add_categories_combined + "_PROJ"] += df.apply(
+        df[add_categories_combined + "_proj"] += df.apply(
             project_stat, stat=cat, axis=1
         )
     for cat in sub_categories:
         if cat == sub_categories[0]:
-            df[sub_categories_combined + "_PROJ"] = df.apply(
+            df[sub_categories_combined + "_proj"] = df.apply(
                 project_stat, stat=cat, axis=1
             )
         else:
-            df[sub_categories_combined + "_PROJ"] -= df.apply(
+            df[sub_categories_combined + "_proj"] -= df.apply(
                 project_stat, stat=cat, axis=1
             )
 
 if add_categories_combined == "" and sub_categories_combined == "":
-    options_proj = [x + "_PROJ" for x in options]
+    options_proj = [x + "_proj" for x in options]
 elif add_categories_combined == "":
-    options_proj = [x + "_PROJ" for x in options] + [sub_categories_combined + "_PROJ"]
+    options_proj = [x + "_proj" for x in options] + [sub_categories_combined + "_proj"]
 elif sub_categories_combined == "":
-    options_proj = [x + "_PROJ" for x in options] + [add_categories_combined + "_PROJ"]
+    options_proj = [x + "_proj" for x in options] + [add_categories_combined + "_proj"]
 else:
-    options_proj = [x + "_PROJ" for x in options] + [
-        add_categories_combined + "_PROJ",
-        sub_categories_combined + "_PROJ",
+    options_proj = [x + "_proj" for x in options] + [
+        add_categories_combined + "_proj",
+        sub_categories_combined + "_proj",
     ]
 
-active_only = df["STATUS"] == "ACTIVE"
+active_only = df["status"] == "ACTIVE"
 df_for_saving = df.copy().astype(str)
 
 if import_previous_days_csv == True:
     df_previous = pd.read_csv(previous_day_csv_path, dtype=df.dtypes.to_dict())
     df_previous.fillna(0, inplace=True)
-    df_previous.set_index(["NAME", "TEAM"], inplace=True)
+    df_previous.set_index(["name", "team"], inplace=True)
     df = pd.concat([df, df_previous])
 
 change_4h_percentage(df)
@@ -154,7 +151,7 @@ if add_categories and sub_categories:
         + [add_categories_combined, sub_categories_combined]
         + options
         + options_proj
-        + [x for x in tiebreakers if x != "MIN"]
+        + [x for x in tiebreakers if x != "min"]
         + topshot_categories
     )
     default_sort = add_categories_combined
@@ -166,7 +163,7 @@ elif add_categories:
         + [add_categories_combined]
         + options
         + options_proj
-        + [x for x in tiebreakers if x != "MIN"]
+        + [x for x in tiebreakers if x != "min"]
         + topshot_categories
     )
     default_sort = add_categories_combined
@@ -178,7 +175,7 @@ elif sub_categories:
         + [sub_categories_combined]
         + options
         + options_proj
-        + [x for x in tiebreakers if x != "MIN"]
+        + [x for x in tiebreakers if x != "min"]
         + topshot_categories
     )
     default_sort = sub_categories_combined
@@ -189,7 +186,7 @@ else:
         fixed_categories
         + options
         + options_proj
-        + [x for x in tiebreakers if x != "MIN"]
+        + [x for x in tiebreakers if x != "min"]
         + topshot_categories
     )
     default_sort = options[0]
@@ -206,13 +203,13 @@ how_many = st.sidebar.slider(
 
 sort_by = st.sidebar.selectbox(
     "Which category do you want to sort by?",
-    options + ["PTS+REB+AST"],
-    (options + ["PTS+REB+AST"]).index(default_sort),
+    options + ["pts+reb+ast"],
+    (options + ["pts+reb+ast"]).index(default_sort),
 )
 
 # Button to refresh live data
 st.sidebar.button("Click Here to Refresh Live Data")
-bench_index = (df["STARTER"] != "Starter") & (df["STATUS"] != "INACTIVE")
+bench_index = (df["starter"] != "Starter") & (df["status"] != "INACTIVE")
 
 list_top = get_top_stats(df, how_many, sort_by, tiebreakers)
 
@@ -220,17 +217,17 @@ list_top = get_top_stats(df, how_many, sort_by, tiebreakers)
 if start_times[0] < today_dataset.now:
     sort_by = [sort_by] + tiebreakers
 else:
-    sort_by = [sort_by] + tiebreakers + [sort_by + "_PROJ"]
+    sort_by = [sort_by] + tiebreakers + [sort_by + "_proj"]
 asc_list = [0] * len(sort_by)
 
 
-st.title("NBA Stat Tracker for {}".format(today_dataset.game_date))
+st.title("NBA Stat Tracker for {}".format(today_dataset.date))
 # todays_games["Start Time"] = todays_games["Start Time"].dt.strftime(("%r EST"))
 # todays_games.set_index("Start Time", inplace=True)
 
 st.table(
     todays_games.reset_index()[
-        ["GAME_STATUS", "AWAY_TEAM", "AWAY_SCORE", "HOME_TEAM", "HOME_SCORE",]
+        ["game_status", "away_team", "away_score", "home_team", "home_score",]
     ]
 )
 

@@ -33,7 +33,7 @@ headers = {
 @st.cache(allow_output_mutation=True)
 def get_team_stats(team_id):
     team_player_dash = teamplayerdashboard.TeamPlayerDashboard(
-        team_id, headers=headers, timeout=100
+        team_id, headers=headers, timeout=100, date_from_nullable="10/18/2021"
     )
     time.sleep(0.2)
     dict = team_player_dash.get_dict()
@@ -401,14 +401,6 @@ class Stat_Dataset:
         """
         daily_stats = self.live_stats
         team_stats = self.season_stats
-        teams_started = []
-
-        for i, row in todays_games.iterrows():
-            if row["START_TIME"] < self.now.astimezone(self.timezone):
-                teams_started.append(row["AWAY_TEAM"])
-                teams_started.append(row["HOME_TEAM"])
-
-        teams_started = set(teams_started)
 
         # loop to get game information (teams, period, game clock, score and start time)
         daily_stats_df = pd.DataFrame(self.expected_columns, index=[0])
@@ -589,5 +581,4 @@ class Stat_Dataset:
 
         daily_stats_df.reset_index(inplace=True)
         daily_stats_df.set_index(["NAME", "TEAM", "OPP"], inplace=True)
-
         return daily_stats_df
