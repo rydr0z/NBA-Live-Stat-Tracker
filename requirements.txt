@@ -5,3 +5,4 @@ pytz
 streamlit
 numpy
 streamlit_autorefresh
+nba_api

@@ -350,29 +350,28 @@ class Stat_Dataset:
         # initilize lists for storing data
         daily_stats = []
         for i, row in todays_games.iterrows():
-            if row["GAME_CLOCK"] != "":
-                box = boxscore.BoxScore(row["GAME_ID"])
-                time.sleep(0.2)
-                away_df = pd.DataFrame(box.away_team_player_stats.get_dict())
-                home_df = pd.DataFrame(box.home_team_player_stats.get_dict())
+            box = boxscore.BoxScore(row["GAME_ID"])
+            time.sleep(0.2)
+            away_df = pd.DataFrame(box.away_team_player_stats.get_dict())
+            home_df = pd.DataFrame(box.home_team_player_stats.get_dict())
 
-                away_df = away_df.join(
-                    pd.DataFrame((away_df.pop("statistics").values.tolist()))
-                )
+            away_df = away_df.join(
+                pd.DataFrame((away_df.pop("statistics").values.tolist()))
+            )
 
-                home_df = home_df.join(
-                    pd.DataFrame((home_df.pop("statistics").values.tolist()))
-                )
+            home_df = home_df.join(
+                pd.DataFrame((home_df.pop("statistics").values.tolist()))
+            )
 
-                away_df["GAME_ID"] = row["GAME_ID"]
-                home_df["GAME_ID"] = row["GAME_ID"]
+            away_df["GAME_ID"] = row["GAME_ID"]
+            home_df["GAME_ID"] = row["GAME_ID"]
 
-                away_df["TEAM"] = row["AWAY_TEAM"]
-                away_df["OPP"] = row["HOME_TEAM"]
-                home_df["TEAM"] = row["HOME_TEAM"]
-                home_df["OPP"] = row["AWAY_TEAM"]
-                daily_stats.append(away_df)
-                daily_stats.append(home_df)
+            away_df["TEAM"] = row["AWAY_TEAM"]
+            away_df["OPP"] = row["HOME_TEAM"]
+            home_df["TEAM"] = row["HOME_TEAM"]
+            home_df["OPP"] = row["AWAY_TEAM"]
+            daily_stats.append(away_df)
+            daily_stats.append(home_df)
 
         return daily_stats
 
@@ -482,6 +481,7 @@ class Stat_Dataset:
             daily_stats_df, on=["NAME", "TEAM", "OPP"], lsuffix="_avg", rsuffix="",
         )
         daily_stats_df.reset_index(inplace=True)
+        daily_stats_df["GAME_ID"] = daily_stats_df["GAME_ID_avg"]
 
         ts_raw_data = self.topshot_df
         topshot_data_cheap = self.get_cheapest_moment(ts_raw_data)
