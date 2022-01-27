@@ -39,7 +39,47 @@ def time_to_float(df):
     df["min"] = time[0] + (time[1] / 60)
 
 
-def clean_combined_data(df):
+def score_function(row):
+    if row["period"] == 0:
+        return "-"
+    else:
+        if row["awayorhome"] == "home":
+            return str(row["away_score"]) + "-" + str(row["home_score"])
+        if row["awayorhome"] == "away":
+            return str(row["home_score"]) + "-" + str(row["away_score"])
+
+
+def differential_function(row):
+    if row["period"] == 0:
+        return "-"
+    else:
+        if row["awayorhome"] == "home":
+            return int(row["away_score"]) - int(row["home_score"])
+        if row["awayorhome"] == "away":
+            return int(row["home_score"]) - int(row["away_score"])
+
+
+def on_court_function(row):
+    if row["period"] == 0 or row["game_status"] == "Final":
+        return "-"
+    else:
+        if row["on_court"] == "1":
+            return "In Game"
+        if row["on_court"] == "0":
+            return "On Bench"
+
+
+def starter_function(row):
+    if row["period"] == 0:
+        return "-"
+    else:
+        if row["starter"] == "1":
+            return "Starter"
+        if row["starter"] == "0":
+            return "Bench"
+
+
+def clean_and_create_columns(df):
     for col in Combined.STAT_CATEGORIES_INTEGER:
         df[col] = df[col].fillna(0)
         df[col] = df[col].astype(int)
@@ -47,4 +87,33 @@ def clean_combined_data(df):
     df.rename(columns=Combined.COLUMNS_TO_RENAME, inplace=True)
 
     time_to_float(df)
+
+    df["easy_moment"] = (
+        df["set_easy"]
+        + "-"
+        + df["tier_easy"]
+        + "-"
+        + df["series_easy"]
+        + "-"
+        + df["play_easy"]
+    )
+    df["hard_moment"] = (
+        df["set_hard"]
+        + "-"
+        + df["tier_hard"]
+        + "-"
+        + df["series_hard"]
+        + "-"
+        + df["play_hard"]
+    )
+
+    away_index = df["awayorhome"] == "home"
+    home_index = df["awayorhome"] == "away"
+    df["away_score"].fillna(0, inplace=True)
+    df["home_score"].fillna(0, inplace=True)
+
+    df["score"] = df.apply(score_function, axis=1)
+    df["differential"] = df.apply(differential_function, axis=1)
+    df["on_court"] = df.apply(on_court_function, axis=1)
+    df["starter"] = df.apply(starter_function, axis=1)
 

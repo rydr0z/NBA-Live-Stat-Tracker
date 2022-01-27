@@ -119,3 +119,10 @@ def combine_topshot_data(raw_data):
 
     return topshot_data
 
+
+def change_4h_percentage(df):
+    col_list = ["4h_easy", "4h_hard"]
+    for col in col_list:
+        df[col] = df[col] / 100
+        df[col] = df[col].map("{:.2%}".format)
+

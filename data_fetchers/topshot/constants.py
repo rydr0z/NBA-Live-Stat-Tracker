@@ -43,7 +43,7 @@ class TopShot:
         "Circulation Count_hard": "count_hard",
         "Low Ask_hard": "low_ask_hard",
     }
-    FILE_PATH = "topshot_data.csv"
+    FILE_PATH = "data/topshot_data.csv"
     NAME_FIXES = {
         "Marcus Morris": "Marcus Morris Sr.",
         "Enes Kanter": "Enes Freedom",

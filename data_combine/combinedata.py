@@ -1,4 +1,4 @@
-from data_combine.utils import combine_data, clean_combined_data
+from data_combine.utils import combine_data, clean_and_create_columns
 from data_fetchers.live.livestatfetcher import LiveStats
 from data_fetchers.season.seasonstatfetcher import SeasonStats
 from data_fetchers.todaysgames.todaysgamesfetcher import TodaysGames
@@ -25,5 +25,5 @@ class CombinedStats:
             self.topshot_data,
         )
 
-        clean_combined_data(self.stats)
+        clean_and_create_columns(self.stats)
 
