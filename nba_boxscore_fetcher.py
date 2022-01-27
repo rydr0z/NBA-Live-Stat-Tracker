@@ -556,7 +556,7 @@ class Stat_Dataset:
         daily_stats_df.columns = daily_stats_df.columns.str.upper()
         daily_stats_df.reset_index(inplace=True)
         daily_stats_df.set_index("GAME_ID", inplace=True)
-        todays_games["GAME_ID"] = todays_games["GAME_ID"].astype(float)
+        # todays_games["GAME_ID"] = todays_games["GAME_ID"].astype(float)
         todays_games.set_index("GAME_ID", inplace=True)
         daily_stats_df = daily_stats_df.join(todays_games, on="GAME_ID")
 
