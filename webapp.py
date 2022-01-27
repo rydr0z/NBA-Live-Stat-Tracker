@@ -214,7 +214,7 @@ sort_by = st.sidebar.selectbox(
 st.sidebar.button("Click Here to Refresh Live Data")
 bench_index = (df["STARTER"] != "Starter") & (df["STATUS"] != "INACTIVE")
 
-list_top = get_top_stats(df[bench_index], how_many, sort_by, tiebreakers)
+list_top = get_top_stats(df, how_many, sort_by, tiebreakers)
 
 
 if start_times[0] < today_dataset.now:
