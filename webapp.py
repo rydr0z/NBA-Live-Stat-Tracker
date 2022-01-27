@@ -120,7 +120,7 @@ else:
     ]
 
 active_only = df["STATUS"] == "ACTIVE"
-df_for_saving = df[active_only].copy().astype(str)
+df_for_saving = df.copy().astype(str)
 
 if import_previous_days_csv == True:
     df_previous = pd.read_csv(previous_day_csv_path, dtype=df.dtypes.to_dict())
