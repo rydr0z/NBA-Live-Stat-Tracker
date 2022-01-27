@@ -73,5 +73,5 @@ class Season:
         "x-nba-stats-token": "true",
     }
     START_DATE = "10/18/2021"
-    SLEEP_INTERVAL = 0.2
+    SLEEP_INTERVAL = 1
     TIMEOUT = 100
