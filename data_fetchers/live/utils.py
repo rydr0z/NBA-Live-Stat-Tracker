@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 import pytz
 import streamlit as st
 import pandas as pd
-from sympy import timed
 from data_fetchers.live.constants import Live
 from nba_api.live.nba.endpoints import boxscore
 
