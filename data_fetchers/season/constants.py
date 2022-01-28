@@ -1,4 +1,4 @@
-class Season:
+class SeasonParameters:
     COLUMNS_TO_AVG = [
         "AST",
         "BLK",
@@ -72,6 +72,6 @@ class Season:
         "x-nba-stats-origin": "stats",
         "x-nba-stats-token": "true",
     }
-    START_DATE = "10/18/2021"
     SLEEP_INTERVAL = 1
+    START_DATE = "10/18/2021"
     TIMEOUT = 100

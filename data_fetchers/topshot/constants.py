@@ -1,4 +1,5 @@
-class TopShot:
+class TopShotParameters:
+    FILE_PATH = "data/topshot_data.csv"
     HARD_COLUMNS_TO_RETURN = [
         "4h",
         "Circulation Count",
@@ -9,6 +10,12 @@ class TopShot:
         "Set",
         "Tier",
     ]
+    INTEGER_COLUMNS = ["count_easy", "low_ask_easy", "count_hard", "low_ask_hard"]
+    NAME_FIXES = {
+        "Marcus Morris": "Marcus Morris Sr.",
+        "Enes Kanter": "Enes Freedom",
+        "Steph Curry": "Stephen Curry",
+    }
     RENAMED_COLUMNS = {
         "Time Stamp (EST)": "date_updated_est",
         "Set_easy": "set_easy",
@@ -43,12 +50,5 @@ class TopShot:
         "Circulation Count_hard": "count_hard",
         "Low Ask_hard": "low_ask_hard",
     }
-    FILE_PATH = "data/topshot_data.csv"
-    NAME_FIXES = {
-        "Marcus Morris": "Marcus Morris Sr.",
-        "Enes Kanter": "Enes Freedom",
-        "Steph Curry": "Stephen Curry",
-    }
     TSD_BACKUP = False
-    INTEGER_COLUMNS = ["count_easy", "low_ask_easy", "count_hard", "low_ask_hard"]
     URL = "https://otmnft.com/create_moments_csv/?playerName=&setName=&team=&minprice=&maxprice=&mincirc=&maxcirc=&sortby="

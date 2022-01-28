@@ -1,6 +1,6 @@
 import pandas as pd
 import streamlit as st
-from data_combine.constants import Combined
+from data_combine.constants import CombinedParameters
 
 
 def combine_data(todays_games, daily_stats_df, season_stats_df, topshot_data):
@@ -80,11 +80,11 @@ def starter_function(row):
 
 
 def clean_and_create_columns(df):
-    for col in Combined.STAT_CATEGORIES_INTEGER:
+    for col in CombinedParameters.STAT_CATEGORIES_INTEGER:
         df[col] = df[col].fillna(0)
         df[col] = df[col].astype(int)
 
-    df.rename(columns=Combined.COLUMNS_TO_RENAME, inplace=True)
+    df.rename(columns=CombinedParameters.COLUMNS_TO_RENAME, inplace=True)
 
     time_to_float(df)
 

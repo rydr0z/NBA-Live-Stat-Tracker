@@ -1,7 +1,7 @@
 import pytz
 
 
-class Today:
+class TodayParameters:
     DEFAULT_COLS = [
         "away_id",
         "away_score",

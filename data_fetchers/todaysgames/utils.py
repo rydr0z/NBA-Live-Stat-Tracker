@@ -1,6 +1,6 @@
 import pandas as pd
 from datetime import datetime
-from data_fetchers.todaysgames.constants import Today
+from data_fetchers.todaysgames.constants import TodayParameters
 from nba_api.live.nba.endpoints import scoreboard
 
 
@@ -11,7 +11,7 @@ def get_todays_games():
     games = board.games.get_dict()
 
     # initialize dataframe and list to fetched data
-    todays_games = pd.DataFrame(columns=Today.DEFAULT_COLS)
+    todays_games = pd.DataFrame(columns=TodayParameters.DEFAULT_COLS)
 
     # loop through today's games, get revelant teams, game clock and scores
     for i, game in enumerate(games):
@@ -36,7 +36,7 @@ def get_todays_games():
 
         # Convert start time from UTC to EST timezone
         start = datetime.strptime(game["gameTimeUTC"], "%Y-%m-%dT%H:%M:%S%z")
-        start = start.astimezone(Today.TIMEZONE)
+        start = start.astimezone(TodayParameters.TIMEZONE)
         date = start.strftime("%B %d, %Y")
 
         game_status = game["gameStatusText"]

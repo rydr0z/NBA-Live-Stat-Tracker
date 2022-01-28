@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import time
-from data_fetchers.season.constants import Season
+from data_fetchers.season.constants import SeasonParameters
 from nba_api.stats.endpoints import teamplayerdashboard
 
 # decoration to only run this once on first run, then get data from cache
@@ -13,11 +13,11 @@ def get_team_stats(team_id):
     # Get team stats, then create dataframe
     team_player_dash = teamplayerdashboard.TeamPlayerDashboard(
         team_id,
-        headers=Season.HEADERS,
-        timeout=Season.TIMEOUT,
-        date_from_nullable=Season.START_DATE,
+        headers=SeasonParameters.HEADERS,
+        timeout=SeasonParameters.TIMEOUT,
+        date_from_nullable=SeasonParameters.START_DATE,
     )
-    time.sleep(Season.SLEEP_INTERVAL)
+    time.sleep(SeasonParameters.SLEEP_INTERVAL)
     dict = team_player_dash.get_dict()
     data = dict["resultSets"][1]["rowSet"]
     columns = dict["resultSets"][1]["headers"]
@@ -25,12 +25,12 @@ def get_team_stats(team_id):
 
     # Change certain columns from total for season to an average
     # By diving by the total number of games played in the season
-    df_team[Season.COLUMNS_TO_AVG] = df_team[Season.COLUMNS_TO_AVG].div(
-        df_team["GP"].values, axis=0
-    )
+    df_team[SeasonParameters.COLUMNS_TO_AVG] = df_team[
+        SeasonParameters.COLUMNS_TO_AVG
+    ].div(df_team["GP"].values, axis=0)
 
     # Drop unnecessary stats and change column name for joining with daily stats
-    df_team.drop(columns=Season.COLUMNS_TO_DROP, inplace=True)
+    df_team.drop(columns=SeasonParameters.COLUMNS_TO_DROP, inplace=True)
     df_team.rename(columns={"PLAYER_NAME": "NAME"}, inplace=True)
 
     return df_team

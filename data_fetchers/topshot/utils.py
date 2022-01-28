@@ -1,5 +1,5 @@
 from unicodedata import name
-from data_fetchers.topshot.constants import TopShot
+from data_fetchers.topshot.constants import TopShotParameters
 import requests
 import pandas as pd
 import numpy as np
@@ -7,9 +7,9 @@ import numpy as np
 
 def get_topshot_data():
     # This function downloads the moment data csv and returns a dataframe
-    r = requests.get(TopShot.URL, allow_redirects=True)
-    open(TopShot.FILE_PATH, "wb").write(r.content)
-    topshot_df = pd.read_csv(TopShot.FILE_PATH)
+    r = requests.get(TopShotParameters.URL, allow_redirects=True)
+    open(TopShotParameters.FILE_PATH, "wb").write(r.content)
+    topshot_df = pd.read_csv(TopShotParameters.FILE_PATH)
     return topshot_df
 
 
@@ -34,7 +34,7 @@ def get_cheapest_moment(topshot_df):
     return low_ask_df
 
 
-def get_hard_moments(topshot_df, tsd_backup=TopShot.TSD_BACKUP):
+def get_hard_moments(topshot_df, tsd_backup=TopShotParameters.TSD_BACKUP):
     """This function filters cheapest moment for each player in any of 
     Fandom, Rare, Legendary Tiers. If there are no moments in any of those tiers,
     it will filter the cheapest Top Shot Debut moment.
@@ -64,7 +64,7 @@ def get_hard_moments(topshot_df, tsd_backup=TopShot.TSD_BACKUP):
     idx_list = hard_df["Low Ask"].to_list()
     hard_df = topshot_df.loc[idx_list]
 
-    return hard_df[TopShot.HARD_COLUMNS_TO_RETURN]
+    return hard_df[TopShotParameters.HARD_COLUMNS_TO_RETURN]
 
 
 def fix_topshot_names(topshot_data, name_dict):
@@ -104,14 +104,14 @@ def combine_topshot_data(raw_data):
 
     # rename all columns for when they are joined to other dataframes
     topshot_data.rename(
-        columns=TopShot.RENAMED_COLUMNS, inplace=True,
+        columns=TopShotParameters.RENAMED_COLUMNS, inplace=True,
     )
 
     # Player specific fixes for discrepancies bewteen nba_api name and topshot name
-    fix_topshot_names(topshot_data, TopShot.NAME_FIXES)
+    fix_topshot_names(topshot_data, TopShotParameters.NAME_FIXES)
     topshot_data.set_index("name", inplace=True)
 
-    for col in TopShot.INTEGER_COLUMNS:
+    for col in TopShotParameters.INTEGER_COLUMNS:
         topshot_data[col] = topshot_data[col].fillna(-1)
         topshot_data[col] = topshot_data[col].astype(int)
         topshot_data[col] = topshot_data[col].astype(str)

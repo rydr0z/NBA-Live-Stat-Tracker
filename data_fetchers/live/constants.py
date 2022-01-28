@@ -1,4 +1,4 @@
-class Live:
+class LiveParameters:
     COLUMNS_TO_DROP = ["nameI", "firstName", "familyName", "order", "minutesCalculated"]
     COLUMNS_TO_RENAME = {
         "assists": "ast",
@@ -45,8 +45,6 @@ class Live:
         "Opp": "opp",
         "Game_Clock": "game_clock",
     }
-    SLEEP_INTERVAL = 0.2
-
     EXPECTED_COLUMNS = {
         "status": "ACTIVE",
         "order": 1,
@@ -99,3 +97,4 @@ class Live:
         "TEAM": "team",
         "OPP": "opp",
     }
+    SLEEP_INTERVAL = 0.2

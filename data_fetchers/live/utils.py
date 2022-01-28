@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import pytz
 import streamlit as st
 import pandas as pd
-from data_fetchers.live.constants import Live
+from data_fetchers.live.constants import LiveParameters
 from nba_api.live.nba.endpoints import boxscore
 
 
@@ -19,7 +19,7 @@ def get_live_stats(todays_games):
     for i, row in todays_games.iterrows():
         try:
             box = boxscore.BoxScore(row["game_id"])
-            time.sleep(Live.SLEEP_INTERVAL)
+            time.sleep(LiveParameters.SLEEP_INTERVAL)
             away_df = pd.DataFrame(box.away_team_player_stats.get_dict())
             home_df = pd.DataFrame(box.home_team_player_stats.get_dict())
 
@@ -46,7 +46,7 @@ def get_live_stats(todays_games):
                 )
             )
 
-    daily_stats_df = pd.DataFrame(Live.EXPECTED_COLUMNS, index=[0])
+    daily_stats_df = pd.DataFrame(LiveParameters.EXPECTED_COLUMNS, index=[0])
 
     if daily_stats:
         for i, ds in enumerate(daily_stats):
@@ -60,9 +60,9 @@ def get_live_stats(todays_games):
 
 def clean_live_stats(daily_stats):
     daily_stats.drop(
-        columns=Live.COLUMNS_TO_DROP, inplace=True,
+        columns=LiveParameters.COLUMNS_TO_DROP, inplace=True,
     )
 
     daily_stats.rename(
-        columns=Live.COLUMNS_TO_RENAME, inplace=True,
+        columns=LiveParameters.COLUMNS_TO_RENAME, inplace=True,
     )
