@@ -1,8 +1,10 @@
+from json import JSONDecodeError
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 import pytz
 import streamlit as st
 import pandas as pd
+from sympy import timed
 from data_fetchers.live.constants import Live
 from nba_api.live.nba.endpoints import boxscore
 
@@ -16,7 +18,7 @@ def get_live_stats(todays_games):
     # loop through today's games, get boxscore and create dataframes
     # for away team and home team stats in each game
     for i, row in todays_games.iterrows():
-        if todays_games["start_time"][0] < now:
+        try:
             box = boxscore.BoxScore(row["game_id"])
             time.sleep(Live.SLEEP_INTERVAL)
             away_df = pd.DataFrame(box.away_team_player_stats.get_dict())
@@ -35,10 +37,11 @@ def get_live_stats(todays_games):
             away_df["game_id"], home_df["game_id"] = row["game_id"], row["game_id"]
             away_df["team"], away_df["opp"] = row["away_team"], row["home_team"]
             home_df["team"], home_df["opp"] = row["home_team"], row["away_team"]
-
             # store all stats in list
             daily_stats.append(away_df)
             daily_stats.append(home_df)
+        except JSONDecodeError:
+            print("No live data for games yet.")
 
     daily_stats_df = pd.DataFrame(Live.EXPECTED_COLUMNS, index=[0])
 

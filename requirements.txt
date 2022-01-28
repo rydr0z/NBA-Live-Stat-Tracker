@@ -1,8 +1,9 @@
-requests
-pandas
-datetime
-pytz
-streamlit
-numpy
-streamlit_autorefresh
-nba_api
+nba_api==1.1.11
+numpy==1.20.1
+pandas==1.2.4
+pytz==2021.1
+requests==2.25.1
+streamlit==1.4.0
+streamlit_autorefresh==0.0.1
+urllib3==1.25.8
+
