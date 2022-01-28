@@ -40,7 +40,11 @@ def get_live_stats(todays_games):
             daily_stats.append(away_df)
             daily_stats.append(home_df)
         except JSONDecodeError:
-            print("No live data for games yet.")
+            print(
+                "No live data for games yet. ID {id}: {a} at {h} ".format(
+                    id=row["game_id"], a=row["away_team"], h=row["home_team"]
+                )
+            )
 
     daily_stats_df = pd.DataFrame(Live.EXPECTED_COLUMNS, index=[0])
 
