@@ -1,4 +1,7 @@
 class TopShotParameters:
+    def __init__(self):
+        pass
+
     FILE_PATH = "data/topshot_data.csv"
     HARD_COLUMNS_TO_RETURN = [
         "4h",
@@ -10,6 +13,7 @@ class TopShotParameters:
         "Set",
         "Tier",
     ]
+    FILTER_DICT = {"Top Shot Debut": 1} #Tier": "Rare", "Tier": "Legendary",
     INTEGER_COLUMNS = ["count_easy", "low_ask_easy", "count_hard", "low_ask_hard"]
     NAME_FIXES = {
         "Marcus Morris": "Marcus Morris Sr.",

@@ -35,19 +35,14 @@ def get_cheapest_moment(topshot_df):
 
 
 def get_hard_moments(topshot_df, tsd_backup=TopShotParameters.TSD_BACKUP):
-    """This function filters cheapest moment for each player in any of 
+    """This function filters cheapest moment for each player in any of
     Fandom, Rare, Legendary Tiers. If there are no moments in any of those tiers,
     it will filter the cheapest Top Shot Debut moment.
     """
     topshot_df = filter_unreleased(topshot_df)
 
-    # Get only moments in desired tiers
-    filter_tiers = (
-        (topshot_df.Tier == "Rare")
-        | (topshot_df.Tier == "Legendary")
-        | (topshot_df["Top Shot Debut"] == 1)
-    )
-    hard_df = topshot_df[filter_tiers]
+    f = TopShotParameters.FILTER_DICT
+    hard_df = topshot_df[np.logical_or.reduce([topshot_df[key] == f[key] for key in f])]
 
     # Get TSD moments any players not in tier only if not in the desired tiers
     if tsd_backup:
@@ -104,7 +99,8 @@ def combine_topshot_data(raw_data):
 
     # rename all columns for when they are joined to other dataframes
     topshot_data.rename(
-        columns=TopShotParameters.RENAMED_COLUMNS, inplace=True,
+        columns=TopShotParameters.RENAMED_COLUMNS,
+        inplace=True,
     )
 
     # Player specific fixes for discrepancies bewteen nba_api name and topshot name
@@ -125,4 +121,3 @@ def change_4h_percentage(df):
     for col in col_list:
         df[col] = df[col] / 100
         df[col] = df[col].map("{:.2%}".format)
-

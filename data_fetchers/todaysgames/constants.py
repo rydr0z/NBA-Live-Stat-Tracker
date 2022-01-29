@@ -15,5 +15,4 @@ class TodayParameters:
         "period",
         "start_time",
     ]
-
     TIMEZONE = pytz.timezone("EST")
