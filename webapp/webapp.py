@@ -38,7 +38,7 @@ class WebApp:
         # Create dataframe that webapp will be filtering
         today_dataset = CombinedStats()
         df = today_dataset.stats
-        todays_games = today_dataset.todays_games
+        todays_games = today_dataset.todays_games_df
         start_times = todays_games["start_time"].to_list()
 
         columns = df.columns

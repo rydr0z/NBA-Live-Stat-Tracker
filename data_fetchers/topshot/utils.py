@@ -67,7 +67,7 @@ def fix_topshot_names(topshot_data, name_dict):
     key (str) = original name in TS data
     value (str) = new name to match NBA data"""
     for key in name_dict:
-        topshot_data.name[topshot_data.name == key] = name_dict[key]
+        topshot_data.loc[(topshot_data["name"] == key), ["name"]] = name_dict[key]
 
 
 def combine_topshot_data(raw_data):

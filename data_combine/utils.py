@@ -3,7 +3,7 @@ import streamlit as st
 from data_combine.constants import CombinedParameters
 
 
-def combine_data(todays_games, daily_stats_df, season_stats_df, topshot_data):
+def combine_data(todays_games_df, daily_stats_df, season_stats_df, topshot_data_df, injury_report_df):
     """This is the function for combining the data fetched from various sources"""
     daily_stats_df.set_index(["name", "team", "opp"], inplace=True)
     season_stats_df.set_index(["name", "team", "opp"], inplace=True)
@@ -14,15 +14,20 @@ def combine_data(todays_games, daily_stats_df, season_stats_df, topshot_data):
     stats_df["game_id"] = stats_df["game_id_avg"]
 
     stats_df.set_index("name", inplace=True)
-    stats_df = stats_df.join(topshot_data, on="name", lsuffix="_nba", rsuffix="_TS")
+    stats_df = stats_df.join(topshot_data_df, on="name", lsuffix="_nba", rsuffix="_TS")
+
+    injury_report_df.set_index("name", inplace=True)
+    stats_df = stats_df.join(injury_report_df, on="name")
+
     stats_df.reset_index(inplace=True)
     stats_df.set_index("game_id", inplace=True)
-    todays_games.set_index("game_id", inplace=True)
-    stats_df = stats_df.join(todays_games, on="game_id")
+    todays_games_df.set_index("game_id", inplace=True)
+    stats_df = stats_df.join(todays_games_df, on="game_id")
 
     stats_df.reset_index(inplace=True)
     stats_df.rename(columns={"team_nba": "team"}, inplace=True)
     stats_df.set_index(["name", "team", "opp"], inplace=True)
+
     return stats_df
 
 

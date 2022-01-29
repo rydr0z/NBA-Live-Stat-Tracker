@@ -5,7 +5,7 @@ class WebAppParameters:
     CHALLENGE_CATS = ["reb"]
     CHALLENGE_NOW = True
     CSS_PATH = "frontend/css/streamlit.css"
-    DEFAULT_CATS = ["score", "game_status", "min", "on_court"]
+    DEFAULT_CATS = ["score", "game_status", "injury_status", "min", "on_court"]
     DEFAULT_STAT_CATS = ["pts", "reb", "ast", "stl", "blk", "tov"]
     FILE_NAME_SAVE = "_NBAStats.csv"
     IMPORT_ADDITIONAL_DAY = False

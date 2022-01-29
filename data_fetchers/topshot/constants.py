@@ -2,7 +2,7 @@ class TopShotParameters:
     def __init__(self):
         pass
 
-    FILE_PATH = "data/topshot_data.csv"
+    FILE_PATH = "topshot_data.csv"
     HARD_COLUMNS_TO_RETURN = [
         "4h",
         "Circulation Count",
