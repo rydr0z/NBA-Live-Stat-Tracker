@@ -1,3 +1,4 @@
+
 beautifulsoup4==4.10.0
 nba_api==1.1.11
 numpy==1.21.5
@@ -6,4 +7,3 @@ pytz==2021.3
 requests==2.27.1
 streamlit==1.4.0
 streamlit_autorefresh==0.0.1
-lmxl
