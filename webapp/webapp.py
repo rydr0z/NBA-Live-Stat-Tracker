@@ -70,10 +70,14 @@ class WebApp:
         active_only = df["status"] == "ACTIVE"
         df_for_saving = df.copy().astype(str)
 
-        if WebAppParameters.IMPORT_ADDITIONAL_DAY == True:
-            import_additional_day(df)
+        additional_stat_list = []
+        if WebAppParameters.IMPORT_ADDITIONAL_DAY:
+            for stat in options:
+                add_additional_stats(df, today_dataset.additional_stats_df, stat)
+                additional_stat_list.append(stat+"_total")
+            options = additional_stat_list + options
 
-        # Multiple categories selected for adding and subtracting
+        # Multiple categor ies selected for adding and subtracting
         categories = (
             WebAppParameters.DEFAULT_CATS
             + options
@@ -116,9 +120,12 @@ class WebApp:
                 ["game_status", "away_team", "away_score", "home_team", "home_score",]
             ]
         )
+        for stat in additional_stat_list:
+            st.write("*{} represent all stats accumulated since {}".format(
+                stat, today_dataset.date_prev
+            ))
 
         df = df.sort_values(sort_by, ascending=asc_list)[categories]
-        df.fillna("-", inplace=True)
 
         dfStyler = df.style.set_properties(**{"text-align": "center"})
         dfStyler.set_table_styles(

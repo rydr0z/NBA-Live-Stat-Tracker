@@ -3,12 +3,19 @@ import streamlit as st
 from data_combine.constants import CombinedParameters
 
 
-def combine_data(todays_games_df, daily_stats_df, season_stats_df, topshot_data_df, injury_report_df):
+def combine_data(todays_games_df, daily_stats_df, season_stats_df, topshot_data_df, injury_report_df,
+                 additional_stats_df):
     """This is the function for combining the data fetched from various sources"""
-    daily_stats_df.set_index(["name", "team", "opp"], inplace=True)
-    season_stats_df.set_index(["name", "team", "opp"], inplace=True)
+    season_stats_df.set_index(["name", "team"], inplace=True)
+    if additional_stats_df is not None:
+        additional_stats_df.set_index(["name", "team"], inplace=True)
+        season_stats_df = season_stats_df.join(
+            additional_stats_df, on=["name", "team"], lsuffix="", rsuffix="_prev", how="outer"
+        )
+
+    daily_stats_df.set_index(["name", "team"], inplace=True)
     stats_df = season_stats_df.join(
-        daily_stats_df, on=["name", "team", "opp"], lsuffix="_avg", rsuffix="",
+        daily_stats_df, on=["name", "team"], lsuffix="_avg", rsuffix="",
     )
     stats_df.reset_index(inplace=True)
     stats_df["game_id"] = stats_df["game_id_avg"]
@@ -26,7 +33,7 @@ def combine_data(todays_games_df, daily_stats_df, season_stats_df, topshot_data_
 
     stats_df.reset_index(inplace=True)
     stats_df.rename(columns={"team_nba": "team"}, inplace=True)
-    stats_df.set_index(["name", "team", "opp"], inplace=True)
+    stats_df.set_index(["name", "team"], inplace=True)
 
     return stats_df
 
@@ -36,9 +43,9 @@ def time_to_float(df):
     df["min"] = df["min"].fillna("PT00M00.00S")
     time = (
         df["min"]
-        .str.replace("PT", "", regex=True)
-        .str.replace("S", "", regex=True)
-        .str.split("M", expand=True)
+            .str.replace("PT", "", regex=True)
+            .str.replace("S", "", regex=True)
+            .str.split("M", expand=True)
     )
     time = time.astype(float)
     df["min"] = time[0] + (time[1] / 60)
@@ -94,22 +101,22 @@ def clean_and_create_columns(df):
     time_to_float(df)
 
     df["easy_moment"] = (
-        df["set_easy"]
-        + "-"
-        + df["tier_easy"]
-        + "-"
-        + df["series_easy"]
-        + "-"
-        + df["play_easy"]
+            df["set_easy"]
+            + "-"
+            + df["tier_easy"]
+            + "-"
+            + df["series_easy"]
+            + "-"
+            + df["play_easy"]
     )
     df["hard_moment"] = (
-        df["set_hard"]
-        + "-"
-        + df["tier_hard"]
-        + "-"
-        + df["series_hard"]
-        + "-"
-        + df["play_hard"]
+            df["set_hard"]
+            + "-"
+            + df["tier_hard"]
+            + "-"
+            + df["series_hard"]
+            + "-"
+            + df["play_hard"]
     )
 
     away_index = df["awayorhome"] == "home"
@@ -121,4 +128,3 @@ def clean_and_create_columns(df):
     df["differential"] = df.apply(differential_function, axis=1)
     df["on_court"] = df.apply(on_court_function, axis=1)
     df["starter"] = df.apply(starter_function, axis=1)
-

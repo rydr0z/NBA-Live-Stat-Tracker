@@ -45,12 +45,12 @@ def project_stat(row, stat):
     elif game_clock == "Final" or period == 0 or clock == "":
         return curr_stat
     elif avg_min == 0 or avg_min == np.nan:
-        return 0
+        return 0.0
     elif float(period) < 5:
         time = clock.split(":")
         time = float(time[0]) + (float(time[1]) / 60)
         return float(curr_stat) + (float(avg_stat) / 48.0) * (
-            48 - (float(period) * 12) + float(time)
+                48 - (float(period) * 12) + float(time)
         )
     else:
         time = clock.split(":")
@@ -86,7 +86,6 @@ def add_subtract_stat(df, add_categories, sub_categories):
 
 
 def run_projections(df, options, add_categories, sub_categories):
-
     add_categories_str = "+".join(add_categories)
     sub_categories_str = "-".join(sub_categories)
 
@@ -114,10 +113,17 @@ def run_projections(df, options, add_categories, sub_categories):
 
     return options, options_proj
 
+
 def save_dataframe(df):
     df.to_csv(
         path_or_buf=WebAppParameters.PATH_SAVE
-        + datetime.now().strftime("%F")
-        + WebAppParameters.FILE_NAME_SAVE
+                    + datetime.now().strftime("%F")
+                    + WebAppParameters.FILE_NAME_SAVE
     )
 
+
+def add_additional_stats(df, additional_stats, stat):
+    if additional_stats is not None:
+        df[stat + "_total"] = df[stat]
+        df[stat + "_total"] += additional_stats[stat]
+        df.loc[df[stat + "_total"].isna(),stat + "_total"] = df[stat]

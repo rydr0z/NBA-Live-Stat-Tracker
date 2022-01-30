@@ -2,6 +2,8 @@ import pandas as pd
 from datetime import datetime
 from data_fetchers.todaysgames.constants import TodayParameters
 from nba_api.live.nba.endpoints import scoreboard
+from nba_api.stats.endpoints import scoreboardv2
+from nba_api.stats.library.parameters import GameDate
 
 
 def get_todays_games():
@@ -60,3 +62,14 @@ def get_todays_games():
         )
 
     return todays_games.sort_values("start_time"), date
+
+
+def get_games_on_date(year, month, day):
+    """Fetch today's game information and store in dataframe"""
+    # request today's live scoreboard and get the games
+    game_date = GameDate()
+    date = game_date.get_date(year=year, month=month, day=day)
+    board = scoreboardv2.ScoreboardV2(game_date=date)
+    games_df = board.line_score.get_data_frame()
+    games_df = games_df[["GAME_ID", "TEAM_ID", "TEAM_ABBREVIATION"]]
+    return games_df, date

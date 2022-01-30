@@ -4,9 +4,10 @@ import time
 from data_fetchers.season.constants import SeasonParameters
 from nba_api.stats.endpoints import teamplayerdashboard
 
+
 # decoration to only run this once on first run, then get data from cache
 @st.cache(allow_output_mutation=True)
-def get_team_stats(team_id):
+def get_team_stats(team_id, date_from=SeasonParameters.START_DATE, date_to=SeasonParameters.END_DATE):
     """Given a team_id (ex. '1610612739' = CLE)
     Returns total season stats for each player on team
     df_team (dataframe)"""
@@ -15,7 +16,8 @@ def get_team_stats(team_id):
         team_id,
         headers=SeasonParameters.HEADERS,
         timeout=SeasonParameters.TIMEOUT,
-        date_from_nullable=SeasonParameters.START_DATE,
+        date_from_nullable=date_from,
+        date_to_nullable=date_to
     )
     time.sleep(SeasonParameters.SLEEP_INTERVAL)
     dict = team_player_dash.get_dict()
@@ -62,3 +64,21 @@ def get_season_stats(todays_games):
 
     season_stats_df = pd.concat(team_stats)
     return season_stats_df
+
+
+def get_stats_since(team_ids, date):
+    """"""
+    # initilize list for storing stats
+    team_stats = []
+    # loop through today's games, get stats for each away and home team
+    # create additional columns for matching with daily stats
+    for i, row in team_ids.iterrows():
+        df = get_team_stats(row["TEAM_ID"], date_from=date)
+        df["team"] = row["TEAM_ABBREVIATION"]
+        df["game_id"] = row["GAME_ID"]
+
+        # store all stats in list
+        team_stats.append(df)
+
+    stats_since_df = pd.concat(team_stats)
+    return stats_since_df

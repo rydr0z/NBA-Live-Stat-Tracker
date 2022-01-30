@@ -8,7 +8,7 @@ class WebAppParameters:
     DEFAULT_CATS = ["score", "game_status", "injury_status", "min", "on_court"]
     DEFAULT_STAT_CATS = ["pts", "reb", "ast", "stl", "blk", "tov"]
     FILE_NAME_SAVE = "_NBAStats.csv"
-    IMPORT_ADDITIONAL_DAY = False
+    IMPORT_ADDITIONAL_DAY = True
     LOGO_PATH = "frontend/nba_logo.png"
     NUM_HIGHLIGHTED = 5
     PATH_SAVE = "data/prevgamedays/"

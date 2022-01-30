@@ -1,3 +1,6 @@
+from nba_api.stats.library.parameters import GameDate
+
+
 class SeasonParameters:
     COLUMNS_TO_AVG = [
         "AST",
@@ -61,17 +64,20 @@ class SeasonParameters:
         "Accept-Language": "en-US,en;q=0.9",
         "Connection": "keep-alive",
         "Host": "stats.nba.com",
-        "Origin": "https://www.nba.com",
-        "Referer": "https://www.nba.com/",
+        "Origin": 'https://www.nba.com',
+        "Referer": 'https://www.nba.com/',
         "sec-ch-ua": '"Google Chrome";v="87", ""Not;A\\Brand";v="99", "Chromium";v="87"',
         "sec-ch-ua-mobile": "?1",
         "Sec-Fetch-Dest": "empty",
         "Sec-Fetch-Mode": "cors",
         "Sec-Fetch-Site": "same-site",
-        "User-Agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Mobile Safari/537.36",
+        "User-Agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) "
+                      "Chrome/87.0.4280.141 Mobile Safari/537.36",
         "x-nba-stats-origin": "stats",
         "x-nba-stats-token": "true",
     }
     SLEEP_INTERVAL = 1
-    START_DATE = "10/18/2021"
+    GAME_DATE_OBJECT = GameDate()
+    START_DATE = GAME_DATE_OBJECT.get_date(2021, 10, 18)
+    END_DATE = GAME_DATE_OBJECT.default
     TIMEOUT = 100
