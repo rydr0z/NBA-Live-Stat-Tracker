@@ -120,6 +120,8 @@ class WebApp:
                 ["game_status", "away_team", "away_score", "home_team", "home_score",]
             ]
         )
+        st.title(WebAppParameters.CHALLENGE_NAME)
+        st.write(WebAppParameters.CHALLENGE_DESC)
         for stat in additional_stat_list:
             st.write("*{} represent all stats accumulated since {}".format(
                 stat, today_dataset.date_prev

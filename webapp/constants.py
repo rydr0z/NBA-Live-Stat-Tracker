@@ -4,6 +4,8 @@ class WebAppParameters:
     ADDITIONAL_DAY_PATH = "prevgamedays/2022-01-2122_NBAStats_edited.csv"
     CHALLENGE_CATS = ["reb"]
     CHALLENGE_NOW = True
+    CHALLENGE_NAME = "Flash Challenge: Clean the Glass"
+    CHALLENGE_DESC = "For the “Easy” Flash Challenge Reward, create a Challenge Entry featuring the top five players with the most total rebounds in the NBA games over the weekend of Jan. 28-30, 2022 and earn a Kevin Love Metallic Silver FE Moment™ NFT. For the “Hard” Flash Challenge Reward, create a Challenge Entry using Top Shot Debut Moments of the top five players with the most total rebounds in the NBA games over the weekend of Jan. 28-30, 2022 and add a Rare Pack to your collection."
     CSS_PATH = "frontend/css/streamlit.css"
     DEFAULT_CATS = ["score", "game_status", "injury_status", "min", "on_court"]
     DEFAULT_STAT_CATS = ["pts", "reb", "ast", "stl", "blk", "tov"]
