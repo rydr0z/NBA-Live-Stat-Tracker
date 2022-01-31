@@ -40,6 +40,7 @@ class WebApp:
         df = today_dataset.stats
         todays_games = today_dataset.todays_games_df
         start_times = todays_games["start_time"].to_list()
+        tiebreakers = WebAppParameters.TIEBREAKERS
 
         columns = df.columns
         columns = columns.sort_values()
@@ -69,15 +70,21 @@ class WebApp:
 
         active_only = df["status"] == "ACTIVE"
         df_for_saving = df.copy().astype(str)
+        multi_day_stat_list = []
 
-        additional_stat_list = []
         if WebAppParameters.IMPORT_ADDITIONAL_DAY:
+            #multi_tiebreakers_list = []
+
             for stat in options:
                 add_additional_stats(df, today_dataset.additional_stats_df, stat)
-                additional_stat_list.append(stat+"_total")
-            options = additional_stat_list + options
+                multi_day_stat_list.append(stat+"_total")
+            #for stat in WebAppParameters.TIEBREAKERS:
+            #    add_additional_stats(df, today_dataset.additional_stats_df, stat)
+            #    multi_tiebreakers_list.append(stat + "_total")
+            options = multi_day_stat_list
+            #tiebreakers = multi_tiebreakers_list
 
-        # Multiple categor ies selected for adding and subtracting
+        # Multiple categories selected for adding and subtracting
         categories = (
             WebAppParameters.DEFAULT_CATS
             + options
@@ -105,7 +112,9 @@ class WebApp:
         st.sidebar.button("Click Here to Refresh Live Data")
         bench_index = (df["starter"] != "Starter") & (df["status"] != "INACTIVE")
 
-        list_top = get_top_stats(df, how_many, sort_by, WebAppParameters.TIEBREAKERS)
+        list_top1 = get_top_stats(df, how_many, WebAppParameters.CHALLENGE_CATS[0], WebAppParameters.TIEBREAKERS)
+        list_top2 = get_top_stats(df, how_many, WebAppParameters.CHALLENGE_CATS[1], WebAppParameters.TIEBREAKERS)
+        list_top = list_top1 + list_top2
 
         if start_times[0] < today_dataset.now:
             sort_by = [sort_by] + WebAppParameters.TIEBREAKERS
@@ -122,7 +131,7 @@ class WebApp:
         )
         st.title(WebAppParameters.CHALLENGE_NAME)
         st.write(WebAppParameters.CHALLENGE_DESC)
-        for stat in additional_stat_list:
+        for stat in multi_day_stat_list:
             st.write("*{} represent all stats accumulated since {}".format(
                 stat, today_dataset.date_prev
             ))

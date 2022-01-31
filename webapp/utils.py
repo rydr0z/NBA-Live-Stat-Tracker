@@ -123,6 +123,9 @@ def save_dataframe(df):
 
 
 def add_additional_stats(df, additional_stats, stat):
+    additional_stats.reset_index(inplace=True)
+    additional_stats.groupby(['name']).sum()
+    additional_stats.set_index(['name', 'team'], inplace=True)
     if additional_stats is not None:
         df[stat + "_total"] = df[stat]
         df[stat + "_total"] += additional_stats[stat]

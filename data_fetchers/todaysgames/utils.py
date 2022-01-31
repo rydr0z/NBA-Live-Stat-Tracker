@@ -64,12 +64,17 @@ def get_todays_games():
     return todays_games.sort_values("start_time"), date
 
 
-def get_games_on_date(year, month, day):
+def get_games_on_date(list_of_dates):
     """Fetch today's game information and store in dataframe"""
     # request today's live scoreboard and get the games
-    game_date = GameDate()
-    date = game_date.get_date(year=year, month=month, day=day)
-    board = scoreboardv2.ScoreboardV2(game_date=date)
-    games_df = board.line_score.get_data_frame()
-    games_df = games_df[["GAME_ID", "TEAM_ID", "TEAM_ABBREVIATION"]]
-    return games_df, date
+    all_games = pd.DataFrame(columns=["GAME_ID", "TEAM_ID", "TEAM_ABBREVIATION"])
+    for d in list_of_dates:
+        game_date = GameDate()
+        date = game_date.get_date(year=d[0], month=d[1], day=d[2])
+        board = scoreboardv2.ScoreboardV2(game_date=date)
+        games_df = board.line_score.get_data_frame()
+        games_df = games_df[["GAME_ID", "TEAM_ID", "TEAM_ABBREVIATION"]]
+        all_games = pd.concat([all_games, games_df], axis=0, ignore_index=True)
+
+    print(all_games)
+    return all_games, date

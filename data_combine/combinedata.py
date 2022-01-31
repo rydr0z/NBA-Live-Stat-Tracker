@@ -12,9 +12,9 @@ class CombinedStats:
         tg = TodaysGames()
         self.todays_games_df = tg.todays_games
         self.date = tg.date
-        self.games_df, self.date_prev = tg.get_games_on_date(2022, 1, 28)
+        #self.games_df, self.date_prev = tg.get_games_on_date([(2022, 1, 28), (2022, 1, 29)])
         ls = LiveStats(todays_games=self.todays_games_df)
-        ss = SeasonStats(todays_games=self.todays_games_df, games_df=self.games_df, date=self.date_prev)
+        ss = SeasonStats(todays_games=self.todays_games_df, games_df=None, date=None)
         td = TopShotData()
         ir = InjuryReport()
         self.daily_stats_df = ls.daily_stats_df
