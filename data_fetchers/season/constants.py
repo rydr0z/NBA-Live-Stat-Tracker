@@ -77,7 +77,6 @@ class SeasonParameters:
         "x-nba-stats-token": "true",
     }
     SLEEP_INTERVAL = 2
-    PROXY = ""
     GAME_DATE_OBJECT = GameDate()
     START_DATE = GAME_DATE_OBJECT.get_date(2021, 10, 18)
     END_DATE = GAME_DATE_OBJECT.default

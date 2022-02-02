@@ -25,7 +25,8 @@ class WebApp:
             "Check here to use challenge settings", value=WebAppParameters.CHALLENGE_NOW
         )
         if challenge:
-            stat_categories = WebAppParameters.CHALLENGE_CATS
+            challenge_cats = WebAppParameters.CHALLENGE_CATS
+            stat_categories = ["fgm", "ftm"]
         else:
             stat_categories = WebAppParameters.DEFAULT_STAT_CATS
 
@@ -54,7 +55,7 @@ class WebApp:
 
         # create a multiselect option for adding multiple categories (cat1 + cat2 + cat3...)
         add_categories = st.sidebar.multiselect(
-            "Do you want to add up any categories?", columns,
+            "Do you want to add up any categories?", columns, stat_categories
         )
 
         # create multiselect option for subtracting categories (cat1 - cat2 - cat3...)
@@ -69,6 +70,7 @@ class WebApp:
         add_subtract_stat(df, add_categories, sub_categories)
 
         active_only = df["status"] == "ACTIVE"
+        print(df)
         df_for_saving = df.copy().astype(str)
         multi_day_stat_list = []
 
@@ -112,9 +114,7 @@ class WebApp:
         st.sidebar.button("Click Here to Refresh Live Data")
         bench_index = (df["starter"] != "Starter") & (df["status"] != "INACTIVE")
 
-        list_top1 = get_top_stats(df, how_many, WebAppParameters.CHALLENGE_CATS[0], WebAppParameters.TIEBREAKERS)
-        list_top2 = get_top_stats(df, how_many, WebAppParameters.CHALLENGE_CATS[1], WebAppParameters.TIEBREAKERS)
-        list_top = list_top1 + list_top2
+        list_top = get_top_stats(df, how_many, WebAppParameters.CHALLENGE_CATS, WebAppParameters.TIEBREAKERS)
 
         if start_times[0] < today_dataset.now:
             sort_by = [sort_by] + WebAppParameters.TIEBREAKERS
