@@ -10,7 +10,7 @@ Web App available at: https://share.streamlit.io/rydr0/nba-live-stat-tracker/mai
 
 ## Authors
 
-- [@rydr0](https://www.github.com/rydr0)
+- [@rydr0z](https://www.github.com/rydr0z)
 
 
 ## Screenshots
