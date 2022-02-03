@@ -1,3 +1,4 @@
+import ast
 from cProfile import run
 from webapp.utils import *
 
@@ -70,7 +71,6 @@ class WebApp:
         add_subtract_stat(df, add_categories, sub_categories)
 
         active_only = df["status"] == "ACTIVE"
-        print(df)
         df_for_saving = df.copy().astype(str)
         multi_day_stat_list = []
 
@@ -95,14 +95,14 @@ class WebApp:
             + topshot_categories
         )
         default_sort = options[0]
-
-        how_many = st.sidebar.slider(
-            "Highlight the top ____ players in sorted category",
-            min_value=0,
-            max_value=df.shape[0],
-            value=WebAppParameters.NUM_HIGHLIGHTED,
-            step=1,
-        )
+        if WebAppParameters.TOP_STATS_OVERALL:
+            how_many = st.sidebar.slider(
+                "Highlight the top ____ players in sorted category",
+                min_value=0,
+                max_value=df.shape[0],
+                value=WebAppParameters.NUM_HIGHLIGHTED,
+                step=1,
+            )
 
         sort_by = st.sidebar.selectbox(
             "Which category do you want to sort by?",
@@ -114,7 +114,11 @@ class WebApp:
         st.sidebar.button("Click Here to Refresh Live Data")
         bench_index = (df["starter"] != "Starter") & (df["status"] != "INACTIVE")
 
-        list_top = get_top_stats(df, how_many, WebAppParameters.CHALLENGE_CATS, WebAppParameters.TIEBREAKERS)
+        if WebAppParameters.TOP_STATS_OVERALL:
+            list_top = get_top_stats(df, how_many, WebAppParameters.CHALLENGE_CATS, WebAppParameters.TIEBREAKERS)
+
+        if WebAppParameters.TOP_STATS_PER_GAME:
+            list_top = get_top_stats_each_game(df, today_dataset.todays_games_df, WebAppParameters.CHALLENGE_CATS, WebAppParameters.TIEBREAKERS)
 
         if start_times[0] < today_dataset.now:
             sort_by = [sort_by] + WebAppParameters.TIEBREAKERS
@@ -131,6 +135,10 @@ class WebApp:
         )
         st.title(WebAppParameters.CHALLENGE_NAME)
         st.write(WebAppParameters.CHALLENGE_DESC_EASY)
+        if WebAppParameters.TOP_STATS_OVERALL:
+            st.write("Green lines are the top challenge stat getters overall.")
+        if WebAppParameters.TOP_STATS_PER_GAME:
+            st.write("Green lines are the top challenge stat getters in each game.")
         if WebAppParameters.CHALLENGE_DESC_HARD is not None:
             st.write(WebAppParameters.CHALLENGE_DESC_HARD)
         for stat in multi_day_stat_list:
@@ -150,11 +158,8 @@ class WebApp:
             # if datetime.now > today_dataset.start_times[-1] + timedelta(hours=3):
             save_dataframe(df_for_saving)
             if start_times[0] < today_dataset.now:
-                if how_many == 0:
-                    st.dataframe(df, height=700)
-                else:
-                    st.dataframe(
-                        df.style.apply(bg_color, list_top=list_top), height=700
-                    )
+                st.dataframe(
+                    df.style.apply(bg_color, list_top=list_top), height=700
+                )
             else:
                 st.dataframe(df, height=700)

@@ -76,5 +76,4 @@ def get_games_on_date(list_of_dates):
         games_df = games_df[["GAME_ID", "TEAM_ID", "TEAM_ABBREVIATION"]]
         all_games = pd.concat([all_games, games_df], axis=0, ignore_index=True)
 
-    print(all_games)
     return all_games, date

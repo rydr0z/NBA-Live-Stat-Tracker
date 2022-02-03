@@ -22,6 +22,24 @@ def get_top_stats(df, num, stat, tiebreakers):
     return list_largest
 
 
+def get_top_stats_each_game(df, todays_games, stat, tiebreakers):
+    # sort by tiebreakers first
+    # (team point differential -> plus minus -> minutes)
+    df.sort_values(
+        tiebreakers, inplace=True, ascending=False,
+    )
+    list_largest = pd.DataFrame()
+    for index, game in todays_games.iterrows():
+        df_game = df[df["game_id"] == index]
+        df_game = df_game.dropna(axis=0, subset=["set_easy"])[[stat]]
+        if df_game[stat].dtype == object:
+            largest = df_game.sort_values(by=stat, ascending=False)[:1]
+        else:
+            largest = df_game.nlargest(1, stat)
+        list_largest = pd.concat([list_largest, largest])
+    return list_largest
+
+
 def bg_color(col, list_top):
     pd.options.display.precision = 2
     pd.options.display.float_format = "{:,.2f}".format
@@ -129,4 +147,4 @@ def add_additional_stats(df, additional_stats, stat):
     if additional_stats is not None:
         df[stat + "_total"] = df[stat]
         df[stat + "_total"] += additional_stats[stat]
-        df.loc[df[stat + "_total"].isna(),stat + "_total"] = df[stat]
+        df.loc[df[stat + "_total"].isna(), stat + "_total"] = df[stat]

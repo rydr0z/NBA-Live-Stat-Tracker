@@ -72,7 +72,7 @@ def differential_function(row):
 
 
 def on_court_function(row):
-    if row["period"] == 0 or row["game_status"] == "Final":
+    if row["period"] == 0 or row["game_status"] == "Final" or row["game_status"] == "Final/OT":
         return "-"
     else:
         if row["on_court"] == "1":
