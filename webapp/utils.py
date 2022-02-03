@@ -40,10 +40,10 @@ def project_stat(row, stat):
     curr_stat = row[stat]
     avg_stat = row[stat + "_avg"]
     period = row["period"]
-    if clock == "" or clock == np.nan or type(clock) == float:
-        return avg_stat
-    elif game_clock == "Final" or period == 0 or clock == "":
+    if game_clock == "Final" or period == 0 or clock == "":
         return curr_stat
+    elif clock == np.nan or type(clock) == float:
+        return avg_stat
     elif avg_min == 0 or avg_min == np.nan:
         return 0.0
     elif float(period) < 5:
