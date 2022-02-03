@@ -12,9 +12,7 @@ class WebAppParameters:
                           " does not have a Series 1 or Series 2 Moment, you need their Top Shot Debut. If any of" \
                           " the players don't have a Moment on NBA Top Shot at the start of the Flash Challenge, then" \
                           " the player with the fifth most assists will be needed and so on."
-    CHALLENGE_DESC_HARD = "Hard Flash: Create a challenge entry with a Top Shot Debut Moment of the top player in each" \
-                          " game tonight, February 2, 2022, in most combined Free Throws made & Field Goals Made. " \
-                          "OR you may use Luka Dončić and/or LaMelo Ball Cool Cats Moments in any or all slots."
+    CHALLENGE_DESC_HARD = None
     CSS_PATH = "frontend/css/streamlit.css"
     DEFAULT_CATS = ["score", "game_status", "injury_status", "min", "on_court"]
     DEFAULT_STAT_CATS = ["pts", "reb", "ast", "stl", "blk", "tov"]
