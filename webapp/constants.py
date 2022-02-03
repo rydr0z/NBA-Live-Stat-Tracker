@@ -5,7 +5,11 @@ class WebAppParameters:
     CHALLENGE_CATS = "fgm+ftm"
     CHALLENGE_NOW = True
     CHALLENGE_NAME = "Flash Challenge: 'Takeover' "
-    CHALLENGE_DESC = "Easy Flash: Create a challenge entry with any Moment of the top player in each game tonight, February 2, 2022, in most combined Free throws made & Field Goals Made. Create a challenge entry with a Top Shot Debut Moment of the top player in each game tonight, February 2, 2022, in most combined Free Throws made & Field Goals Made. OR you may use Luka Dončić and/or LaMelo Ball Cool Cats Moments in any or all slots."
+    CHALLENGE_DESC_EASY = "Easy Flash: Create a challenge entry with any Moment of the top player in each game tonight, " \
+                          "February 2, 2022, in most combined Free throws made & Field Goals Made."
+    CHALLENGE_DESC_HARD = "Hard Flash: Create a challenge entry with a Top Shot Debut Moment of the top player in each" \
+                          " game tonight, February 2, 2022, in most combined Free Throws made & Field Goals Made. " \
+                          "OR you may use Luka Dončić and/or LaMelo Ball Cool Cats Moments in any or all slots."
     CSS_PATH = "frontend/css/streamlit.css"
     DEFAULT_CATS = ["score", "game_status", "injury_status", "min", "on_court"]
     DEFAULT_STAT_CATS = ["pts", "reb", "ast", "stl", "blk", "tov"]

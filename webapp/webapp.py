@@ -130,7 +130,9 @@ class WebApp:
             ]
         )
         st.title(WebAppParameters.CHALLENGE_NAME)
-        st.write(WebAppParameters.CHALLENGE_DESC)
+        st.write(WebAppParameters.CHALLENGE_DESC_EASY)
+        if WebAppParameters.CHALLENGE_DESC_HARD is not None:
+            st.write(WebAppParameters.CHALLENGE_DESC_HARD)
         for stat in multi_day_stat_list:
             st.write("*{} represent all stats accumulated since {}".format(
                 stat, today_dataset.date_prev
