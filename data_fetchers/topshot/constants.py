@@ -19,6 +19,7 @@ class TopShotParameters:
         "Marcus Morris": "Marcus Morris Sr.",
         "Enes Kanter": "Enes Freedom",
         "Steph Curry": "Stephen Curry",
+        "Nicolas Claxton": "Nic Claxton",
     }
     RENAMED_COLUMNS = {
         "Time Stamp (EST)": "date_updated_est",

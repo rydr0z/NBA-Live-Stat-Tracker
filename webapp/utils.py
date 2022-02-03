@@ -37,6 +37,7 @@ def get_top_stats_each_game(df, todays_games, stat, tiebreakers):
         else:
             largest = df_game.nlargest(1, stat)
         list_largest = pd.concat([list_largest, largest])
+    print(list_largest)
     return list_largest
 
 

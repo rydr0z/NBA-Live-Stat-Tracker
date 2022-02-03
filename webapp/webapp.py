@@ -26,13 +26,12 @@ class WebApp:
             "Check here to use challenge settings", value=WebAppParameters.CHALLENGE_NOW
         )
         if challenge:
-            challenge_cats = WebAppParameters.CHALLENGE_CATS
-            stat_categories = ["fgm", "ftm"]
+            stat_categories = WebAppParameters.CHALLENGE_CATS
         else:
             stat_categories = WebAppParameters.DEFAULT_STAT_CATS
 
         topshot_categories = (
-            WebAppParameters.TS_HARD_CATS + WebAppParameters.TS_EASY_CATS
+            WebAppParameters.TS_EASY_CATS# + WebAppParameters.TS_HARD_CATS
         )
 
         # ----------------------------------------------------------------------
@@ -56,7 +55,7 @@ class WebApp:
 
         # create a multiselect option for adding multiple categories (cat1 + cat2 + cat3...)
         add_categories = st.sidebar.multiselect(
-            "Do you want to add up any categories?", columns, stat_categories
+            "Do you want to add up any categories?", columns
         )
 
         # create multiselect option for subtracting categories (cat1 - cat2 - cat3...)
