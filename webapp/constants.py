@@ -16,7 +16,7 @@ class WebAppParameters:
     FILE_NAME_SAVE = "_NBAStats.csv"
     IMPORT_ADDITIONAL_DAY = False
     LOGO_PATH = "frontend/nba_logo.png"
-    NUM_HIGHLIGHTED = 5
+    NUM_HIGHLIGHTED = 0
     PATH_SAVE = "data/prevgamedays/"
     TIEBREAKERS = ["differential", "plus_minus", "min"]
     TS_EASY_CATS = ["easy_moment", "count_easy", "low_ask_easy", "4hchange_easy"]
