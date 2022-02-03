@@ -31,7 +31,7 @@ class WebApp:
             stat_categories = WebAppParameters.DEFAULT_STAT_CATS
 
         topshot_categories = (
-            WebAppParameters.TS_EASY_CATS + WebAppParameters.TS_HARD_CATS
+            WebAppParameters.TS_HARD_CATS + WebAppParameters.TS_EASY_CATS
         )
 
         # ----------------------------------------------------------------------
