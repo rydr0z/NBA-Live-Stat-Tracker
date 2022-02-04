@@ -26,7 +26,6 @@ def get_cheapest_moment(topshot_df, filter_or=None, filter_and=None, tsd_backup=
     topshot_cheap = topshot_df
     if filter_or is not None:
         topshot_cheap = topshot_cheap[np.logical_or.reduce([topshot_cheap[key] == filter_or[key] for key in filter_or])]
-        print(topshot_cheap["Series"])
     if filter_and is not None:
         topshot_cheap = topshot_cheap[np.logical_and.reduce([topshot_cheap[key] == filter_and[key] for key in filter_and])]
     # get the indices of lowest ask moment for each player and return full filtered dataframe
