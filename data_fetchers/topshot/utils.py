@@ -20,46 +20,33 @@ def filter_unreleased(topshot_df):
     return topshot_df[unreleased_filter]
 
 
-def get_cheapest_moment(topshot_df):
+def get_cheapest_moment(topshot_df, filter_or=None, filter_and=None, tsd_backup=False):
     # This function filters topshot dataframe with only cheapest moment from each player
     topshot_df = filter_unreleased(topshot_df)
-
+    topshot_cheap = topshot_df
+    if filter_or is not None:
+        topshot_cheap = topshot_cheap[np.logical_or.reduce([topshot_cheap[key] == filter_or[key] for key in filter_or])]
+        print(topshot_cheap["Series"])
+    if filter_and is not None:
+        topshot_cheap = topshot_cheap[np.logical_and.reduce([topshot_cheap[key] == filter_and[key] for key in filter_and])]
     # get the indices of lowest ask moment for each player and return full filtered dataframe
-    low_ask_df = (
-        topshot_df[["Player Name", "Low Ask"]].groupby(["Player Name"]).idxmin()
-    )
-    idx_list = low_ask_df["Low Ask"].to_list()
-    low_ask_df = topshot_df.loc[idx_list]
-
-    return low_ask_df
-
-
-def get_hard_moments(topshot_df, tsd_backup=TopShotParameters.TSD_BACKUP):
-    """This function filters cheapest moment for each player in any of
-    Fandom, Rare, Legendary Tiers. If there are no moments in any of those tiers,
-    it will filter the cheapest Top Shot Debut moment.
-    """
-    topshot_df = filter_unreleased(topshot_df)
-
-    f = TopShotParameters.FILTER_DICT
-    hard_df = topshot_df[np.logical_or.reduce([topshot_df[key] == f[key] for key in f])]
-
-    # Get TSD moments any players not in tier only if not in the desired tiers
     if tsd_backup:
         filter_not_tiers = ~topshot_df["Player Name"].isin(
-            hard_df["Player Name"].unique()
+            topshot_cheap["Player Name"].unique()
         )
         filter_tsd = topshot_df["Top Shot Debut"] == 1
         top_shot_debuts = topshot_df[filter_not_tiers][filter_tsd]
 
         # Combine the two filtered dataframes and get indices of lowest ask moments
-        hard_df = pd.concat([hard_df, top_shot_debuts])
+        topshot_cheap = pd.concat([topshot_cheap, top_shot_debuts])
 
-    hard_df = hard_df[["Player Name", "Low Ask"]].groupby(["Player Name"]).idxmin()
-    idx_list = hard_df["Low Ask"].to_list()
-    hard_df = topshot_df.loc[idx_list]
+    topshot_cheap = (
+        topshot_cheap[["Player Name", "Low Ask"]].groupby(["Player Name"]).idxmin()
+    )
+    idx_list = topshot_cheap["Low Ask"].to_list()
+    low_ask_df = topshot_df.loc[idx_list]
 
-    return hard_df[TopShotParameters.HARD_COLUMNS_TO_RETURN]
+    return low_ask_df
 
 
 def fix_topshot_names(topshot_data, name_dict):
@@ -73,8 +60,13 @@ def fix_topshot_names(topshot_data, name_dict):
 def combine_topshot_data(raw_data):
     """Fetches all TopShot data, then combines cheapest and hard moments
     then processes the dataframe"""
-    topshot_data_cheapest = get_cheapest_moment(raw_data)
-    topshot_data_hard = get_hard_moments(raw_data)
+    topshot_data_cheapest = get_cheapest_moment(raw_data, filter_or=TopShotParameters.FILTER_EASY,
+                                                tsd_backup=TopShotParameters.TSD_BACKUP_EASY)
+
+    topshot_data_hard = get_cheapest_moment(raw_data, filter_or=TopShotParameters.FILTER_HARD,
+                                            tsd_backup=TopShotParameters.TSD_BACKUP_HARD)
+
+    topshot_data_hard = topshot_data_hard[TopShotParameters.HARD_COLUMNS_TO_RETURN]
 
     # Rename column used as index then join cheapest and hard moment info
     topshot_data_cheapest.rename(columns={"Player Name": "name"}, inplace=True)
@@ -92,8 +84,8 @@ def combine_topshot_data(raw_data):
     # matched with NBA Player Names
     topshot_data.name = (
         topshot_data.name.str.normalize("NFKD")
-        .str.encode("ascii", errors="ignore")
-        .str.decode("utf-8")
+            .str.encode("ascii", errors="ignore")
+            .str.decode("utf-8")
     )
     topshot_data.name.astype(str)
 

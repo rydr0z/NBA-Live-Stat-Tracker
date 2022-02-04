@@ -37,7 +37,6 @@ def get_top_stats_each_game(df, todays_games, stat, tiebreakers):
         else:
             largest = df_game.nlargest(1, stat)
         list_largest = pd.concat([list_largest, largest])
-    print(list_largest)
     return list_largest
 
 
@@ -59,9 +58,6 @@ def project_stat(row, stat):
     curr_stat = row[stat]
     avg_stat = row[stat + "_avg"]
     period = row["period"]
-    print(period)
-    print(clock)
-    print(game_clock)
     if game_clock == "Final" or game_clock == "Final/OT":
         return float(curr_stat)
     elif clock == np.nan or type(clock) == float or period == 0 or clock == "":

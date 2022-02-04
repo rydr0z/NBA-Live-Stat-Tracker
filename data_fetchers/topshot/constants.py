@@ -13,7 +13,9 @@ class TopShotParameters:
         "Set",
         "Tier",
     ]
-    FILTER_DICT = {"Top Shot Debut": 1} #Tier": "Rare", "Tier": "Legendary",
+    FILTER_EASY = {"Series": "1", "Series": "2"}
+    FILTER_HARD = {"Top Shot Debut": 1} #Tier": "Rare", "Tier": "Legendary"
+
     INTEGER_COLUMNS = ["count_easy", "low_ask_easy", "count_hard", "low_ask_hard"]
     NAME_FIXES = {
         "Marcus Morris": "Marcus Morris Sr.",
@@ -55,5 +57,6 @@ class TopShotParameters:
         "Circulation Count_hard": "count_hard",
         "Low Ask_hard": "low_ask_hard",
     }
-    TSD_BACKUP = False
+    TSD_BACKUP_EASY = True
+    TSD_BACKUP_HARD = False
     URL = "https://otmnft.com/create_moments_csv/?playerName=&setName=&team=&minprice=&maxprice=&mincirc=&maxcirc=&sortby="
