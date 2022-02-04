@@ -52,6 +52,7 @@ def bg_color(col, list_top):
 
 
 def project_stat(row, stat):
+    inj = row["injury_status"]
     clock = row["game_clock"]
     avg_min = row["min_avg"]
     game_clock = row["game_status"]
@@ -62,7 +63,7 @@ def project_stat(row, stat):
         return float(curr_stat)
     elif clock == np.nan or type(clock) == float or period == 0 or clock == "":
         return float(avg_stat)
-    elif avg_min == 0 or avg_min == np.nan:
+    elif avg_min == 0 or avg_min == np.nan or "INJ" in str(inj):
         return 0.0
     elif float(period) < 5:
         time = clock.split(":")

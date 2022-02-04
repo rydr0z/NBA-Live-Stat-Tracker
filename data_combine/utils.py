@@ -1,5 +1,6 @@
 import pandas as pd
 import streamlit as st
+import numpy as np
 from data_combine.constants import CombinedParameters
 
 
@@ -72,7 +73,9 @@ def differential_function(row):
 
 
 def on_court_function(row):
-    if row["period"] == 0 or row["game_status"] == "Final" or row["game_status"] == "Final/OT":
+    if row["injury_status"] is not np.nan:
+        return row["injury_status"]
+    elif row["period"] == 0 or row["game_status"] == "Final" or row["game_status"] == "Final/OT":
         return "-"
     else:
         if row["on_court"] == "1":

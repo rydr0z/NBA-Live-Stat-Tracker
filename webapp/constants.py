@@ -14,7 +14,7 @@ class WebAppParameters:
                           " the player with the fifth most assists will be needed and so on."
     CHALLENGE_DESC_HARD = None
     CSS_PATH = "frontend/css/streamlit.css"
-    DEFAULT_CATS = ["score", "game_status", "injury_status", "min", "on_court"]
+    DEFAULT_CATS = ["score", "game_status", "min", "on_court"]
     DEFAULT_STAT_CATS = ["pts", "reb", "ast", "stl", "blk", "tov"]
     FILE_NAME_SAVE = "_NBAStats.csv"
     IMPORT_ADDITIONAL_DAY = False

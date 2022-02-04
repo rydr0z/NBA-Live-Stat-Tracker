@@ -8,13 +8,13 @@ from data_fetchers.injuries.injuryreport import InjuryReport
 
 class CombinedStats:
 
-    def __init__(self):
+    def __init__(self, games_df=None, date=None, last_n_games=0):
         tg = TodaysGames()
         self.todays_games_df = tg.todays_games
         self.date = tg.date
         #self.games_df, self.date_prev = tg.get_games_on_date([(2022, 1, 28), (2022, 1, 29)])
         ls = LiveStats(todays_games=self.todays_games_df)
-        ss = SeasonStats(todays_games=self.todays_games_df, games_df=None, date=None)
+        ss = SeasonStats(todays_games=self.todays_games_df, games_df=games_df, date=date, last_n_games=last_n_games)
         td = TopShotData()
         ir = InjuryReport()
         self.daily_stats_df = ls.daily_stats_df

@@ -35,9 +35,17 @@ class WebApp:
         )
 
         # ----------------------------------------------------------------------
+        last_n_games_options = ["All", 30, 14, 7]
+        last_n_games = st.sidebar.selectbox(
+            "Use season averages from the last n games",
+            last_n_games_options,
+            last_n_games_options.index(14),
+        )
+        if last_n_games == "All":
+            last_n_games = 0
 
         # Create dataframe that webapp will be filtering
-        today_dataset = CombinedStats()
+        today_dataset = CombinedStats(last_n_games=last_n_games)
         df = today_dataset.stats
         todays_games = today_dataset.todays_games_df
         start_times = todays_games["start_time"].to_list()
@@ -46,11 +54,16 @@ class WebApp:
         columns = df.columns
         columns = columns.sort_values()
 
+        season_avg_columns = [x + "_avg" for x in columns if x + "_avg" in columns]
         columns = [x for x in columns if x + "_avg" in columns]
 
         # Create a multiselect option for individual categories and generate prediction for each option selected
         options = st.sidebar.multiselect(
-            "Which stats are you interested in?", columns, stat_categories
+            "Which live game stats are you interested in?", columns, stat_categories
+        )
+
+        season_avg_options = st.sidebar.multiselect(
+            "Which season average stats are you interested in?", season_avg_columns
         )
 
         # create a multiselect option for adding multiple categories (cat1 + cat2 + cat3...)
@@ -89,6 +102,7 @@ class WebApp:
         categories = (
             WebAppParameters.DEFAULT_CATS
             + options
+            + season_avg_options
             + options_proj
             + [x for x in WebAppParameters.TIEBREAKERS if x != "min"]
             + topshot_categories
@@ -135,9 +149,11 @@ class WebApp:
         st.title(WebAppParameters.CHALLENGE_NAME)
         st.write(WebAppParameters.CHALLENGE_DESC_EASY)
         if WebAppParameters.TOP_STATS_OVERALL:
-            st.write("Green lines are the top challenge stat getters overall.")
+            st.write("Green highlights are for the challenge stat leaders overall that have an eligible NBA Top Shot "
+                     "moment.")
         if WebAppParameters.TOP_STATS_PER_GAME:
-            st.write("Green lines are the top challenge stat getters in each game.")
+            st.write("Green highlights are for the challenge stat leaders in each game that have an eligible NBA Top "
+                     "Shot moment.")
         if WebAppParameters.CHALLENGE_DESC_HARD is not None:
             st.write(WebAppParameters.CHALLENGE_DESC_HARD)
         for stat in multi_day_stat_list:
