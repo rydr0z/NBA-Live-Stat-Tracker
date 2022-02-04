@@ -128,10 +128,16 @@ class WebApp:
         bench_index = (df["starter"] != "Starter") & (df["status"] != "INACTIVE")
 
         if WebAppParameters.TOP_STATS_OVERALL:
-            list_top = get_top_stats(df, how_many, WebAppParameters.CHALLENGE_CATS, WebAppParameters.TIEBREAKERS)
+            list_top = []
+            for cat in WebAppParameters.CHALLENGE_CATS:
+                add_to_list = get_top_stats(df, how_many, cat, WebAppParameters.TIEBREAKERS)
+                list_top.append(add_to_list)
 
         if WebAppParameters.TOP_STATS_PER_GAME:
-            list_top = get_top_stats_each_game(df, today_dataset.todays_games_df, WebAppParameters.CHALLENGE_CATS, WebAppParameters.TIEBREAKERS)
+            list_top = []
+            for cat in WebAppParameters.CHALLENGE_CATS:
+                add_to_list = get_top_stats_each_game(df, today_dataset.todays_games_df, cat, WebAppParameters.TIEBREAKERS)
+                list_top.append(add_to_list)
 
         if start_times[0] < today_dataset.now:
             sort_by = [sort_by] + WebAppParameters.TIEBREAKERS
