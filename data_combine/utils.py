@@ -67,9 +67,9 @@ def differential_function(row):
         return "-"
     else:
         if row["awayorhome"] == "home":
-            return int(row["away_score"]) - int(row["home_score"])
-        if row["awayorhome"] == "away":
             return int(row["home_score"]) - int(row["away_score"])
+        if row["awayorhome"] == "away":
+            return int(row["away_score"]) - int(row["home_score"])
 
 
 def on_court_function(row):
