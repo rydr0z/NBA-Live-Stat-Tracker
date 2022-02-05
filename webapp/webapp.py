@@ -1,5 +1,8 @@
 import ast
 from cProfile import run
+
+import pandas as pd
+
 from webapp.utils import *
 
 
@@ -110,7 +113,7 @@ class WebApp:
         default_sort = options[0]
         if WebAppParameters.TOP_STATS_OVERALL:
             how_many = st.sidebar.slider(
-                "Highlight the top ____ players in sorted category",
+                "Highlight the top ____ players in sorted categories",
                 min_value=0,
                 max_value=df.shape[0],
                 value=WebAppParameters.NUM_HIGHLIGHTED,
@@ -128,16 +131,22 @@ class WebApp:
         bench_index = (df["starter"] != "Starter") & (df["status"] != "INACTIVE")
 
         if WebAppParameters.TOP_STATS_OVERALL:
-            list_top = []
+            list_top = None
             for cat in WebAppParameters.CHALLENGE_CATS:
                 add_to_list = get_top_stats(df, how_many, cat, WebAppParameters.TIEBREAKERS)
-                list_top.append(add_to_list)
+                if list_top is None:
+                    list_top = add_to_list
+                else:
+                    list_top = pd.concat([list_top, add_to_list])
 
         if WebAppParameters.TOP_STATS_PER_GAME:
-            list_top = []
+            list_top = pd.DataFrame()
             for cat in WebAppParameters.CHALLENGE_CATS:
                 add_to_list = get_top_stats_each_game(df, today_dataset.todays_games_df, cat, WebAppParameters.TIEBREAKERS)
-                list_top.append(add_to_list)
+                if list_top is None:
+                    list_top = add_to_list
+                else:
+                    list_top = pd.concat([list_top, add_to_list])
 
         if start_times[0] < today_dataset.now:
             sort_by = [sort_by] + WebAppParameters.TIEBREAKERS
