@@ -169,6 +169,10 @@ class WebApp:
         if WebAppParameters.TOP_STATS_PER_GAME:
             st.write("Green highlights are for the challenge stat leaders in each game that have an eligible NBA Top "
                      "Shot moment.")
+        st.write("Current Challenge Leaderboard from Friday:")
+        st.write("POINTS  Caris LeVert 42\n"
+                 "REBOUNDS  Jarrett Allen 22\n"
+                 "ASSISTS  Luka Doncic 15")
         if WebAppParameters.CHALLENGE_DESC_HARD is not None:
             st.write(WebAppParameters.CHALLENGE_DESC_HARD)
         for stat in multi_day_stat_list:
@@ -182,7 +186,11 @@ class WebApp:
         dfStyler.set_table_styles(
             [dict(selector="th", props=[("text-align", "center")])]
         )
+        df_top = df[df.index.isin(list_top.index)][options + topshot_categories]
 
+        st.title("Current Challenge Leaders")
+        st.dataframe(df_top)
+        st.title("Complete Leaderboard")
         # Options for Pandas DataFrame Style
         if count % 1 == 0 or count == 0:
             # if datetime.now > today_dataset.start_times[-1] + timedelta(hours=3):
