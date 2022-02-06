@@ -28,4 +28,5 @@ class WebAppParameters:
     TS_HARD_CATS = ["hard_moment", "count_hard", "low_ask_hard", "4hchange_hard"]
     TOP_STATS_OVERALL = True
     TOP_STATS_PER_GAME = False
-    CHALLENGE_LEADERS = pd.Index(["Caris LeVert", "Jarrett Allen", "Luka Doncic"])
+    CHALLENGE_LEADERS = pd.Index(["Caris LeVert", "Jarrett Allen", "Luka Doncic", "RJ Barrett", "Anthony Davis",
+                                  "Tyrese Haliburton"])

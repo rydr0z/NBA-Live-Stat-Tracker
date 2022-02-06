@@ -180,10 +180,13 @@ class WebApp:
         df_all_challenge = topshot_moments[topshot_moments.index.isin(WebAppParameters.CHALLENGE_LEADERS)][topshot_categories]
         df_top = df[df.index.isin(list_top.index)][options + topshot_categories]
 
-        st.title("Previous Day's Challenge Moments")
+        st.title("Friday Feb 4 & Saturday Feb 5 Challenge Moments")
         st.dataframe(df_all_challenge)
         st.title("Today's Challenge Leaders")
-        st.dataframe(df_top)
+        if start_times[0] < today_dataset.now:
+            st.dataframe(df_top)
+        else:
+            st.write("Today's games have not started yet.")
         st.title("Complete Leaderboard")
         if WebAppParameters.TOP_STATS_OVERALL:
             st.write("Green highlights are for the challenge stat leaders overall that have an eligible NBA Top Shot "

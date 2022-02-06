@@ -111,4 +111,6 @@ def clean_and_create_columns(df):
     df["score"] = df.apply(score_function, axis=1)
     df["differential"] = df.apply(differential_function, axis=1)
     df["on_court"] = df.apply(on_court_function, axis=1)
+    for column in CombinedParameters.NA_COLUMNS_TO_FILL:
+        df[column].fillna("-", inplace=True)
     df["starter"] = df.apply(starter_function, axis=1)

@@ -31,3 +31,5 @@ class CombinedParameters:
         "stl",
         "tov",
     ]
+    NA_COLUMNS_TO_FILL = ["on_court", "easy_moment", "count_easy", "4hchange_easy", "low_ask_easy", "hard_moment",
+                          "count_hard","4hchange_hard", "low_ask_hard"]
