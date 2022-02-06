@@ -1,8 +1,6 @@
 class CombinedParameters:
     COLUMNS_TO_RENAME = {
         "team_nba": "team",
-        "4h_easy": "4hchange_easy",
-        "4h_hard": "4hchange_hard",
     }
     STAT_CATEGORIES_INTEGER = [
         "ast",

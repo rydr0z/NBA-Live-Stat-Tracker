@@ -103,25 +103,6 @@ def clean_and_create_columns(df):
 
     time_to_float(df)
 
-    df["easy_moment"] = (
-            df["set_easy"]
-            + "-"
-            + df["tier_easy"]
-            + "-"
-            + df["series_easy"]
-            + "-"
-            + df["play_easy"]
-    )
-    df["hard_moment"] = (
-            df["set_hard"]
-            + "-"
-            + df["tier_hard"]
-            + "-"
-            + df["series_hard"]
-            + "-"
-            + df["play_hard"]
-    )
-
     away_index = df["awayorhome"] == "home"
     home_index = df["awayorhome"] == "away"
     df["away_score"].fillna(0, inplace=True)

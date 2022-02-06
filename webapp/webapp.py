@@ -50,6 +50,7 @@ class WebApp:
         # Create dataframe that webapp will be filtering
         today_dataset = CombinedStats(last_n_games=last_n_games)
         df = today_dataset.stats
+        topshot_moments = today_dataset.topshot_data_df
         todays_games = today_dataset.todays_games_df
         start_times = todays_games["start_time"].to_list()
         tiebreakers = WebAppParameters.TIEBREAKERS
@@ -163,16 +164,6 @@ class WebApp:
         )
         st.title(WebAppParameters.CHALLENGE_NAME)
         st.write(WebAppParameters.CHALLENGE_DESC_EASY)
-        if WebAppParameters.TOP_STATS_OVERALL:
-            st.write("Green highlights are for the challenge stat leaders overall that have an eligible NBA Top Shot "
-                     "moment.")
-        if WebAppParameters.TOP_STATS_PER_GAME:
-            st.write("Green highlights are for the challenge stat leaders in each game that have an eligible NBA Top "
-                     "Shot moment.")
-        st.write("Current Challenge Leaderboard from Friday:")
-        st.write("POINTS  Caris LeVert 42\n"
-                 "REBOUNDS  Jarrett Allen 22\n"
-                 "ASSISTS  Luka Doncic 15")
         if WebAppParameters.CHALLENGE_DESC_HARD is not None:
             st.write(WebAppParameters.CHALLENGE_DESC_HARD)
         for stat in multi_day_stat_list:
@@ -186,11 +177,20 @@ class WebApp:
         dfStyler.set_table_styles(
             [dict(selector="th", props=[("text-align", "center")])]
         )
+        df_all_challenge = topshot_moments[topshot_moments.index.isin(WebAppParameters.CHALLENGE_LEADERS)][topshot_categories]
         df_top = df[df.index.isin(list_top.index)][options + topshot_categories]
 
-        st.title("Current Challenge Leaders")
+        st.title("Previous Day's Challenge Moments")
+        st.dataframe(df_all_challenge)
+        st.title("Today's Challenge Leaders")
         st.dataframe(df_top)
         st.title("Complete Leaderboard")
+        if WebAppParameters.TOP_STATS_OVERALL:
+            st.write("Green highlights are for the challenge stat leaders overall that have an eligible NBA Top Shot "
+                     "moment.")
+        if WebAppParameters.TOP_STATS_PER_GAME:
+            st.write("Green highlights are for the challenge stat leaders in each game that have an eligible NBA Top "
+                     "Shot moment.")
         # Options for Pandas DataFrame Style
         if count % 1 == 0 or count == 0:
             # if datetime.now > today_dataset.start_times[-1] + timedelta(hours=3):

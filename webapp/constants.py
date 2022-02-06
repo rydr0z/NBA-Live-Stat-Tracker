@@ -1,3 +1,5 @@
+import pandas as pd
+
 class WebAppParameters:
     AUTO_REFRESH_INTERVAL = 60000  # 1 minute
     AUTO_REFRESH_LIMIT = 120
@@ -26,3 +28,4 @@ class WebAppParameters:
     TS_HARD_CATS = ["hard_moment", "count_hard", "low_ask_hard", "4hchange_hard"]
     TOP_STATS_OVERALL = True
     TOP_STATS_PER_GAME = False
+    CHALLENGE_LEADERS = pd.Index(["Caris LeVert", "Jarrett Allen", "Luka Doncic"])
