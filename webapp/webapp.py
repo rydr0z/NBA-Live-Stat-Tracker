@@ -11,7 +11,7 @@ class WebApp:
         pass
 
     def run_webapp(self):
-        st.sidebar.image(WebAppParameters.LOGO_PATH)
+        st.sidebar.image("NBA Stat Logo.png")
 
         count = st_autorefresh(
             interval=WebAppParameters.AUTO_REFRESH_INTERVAL,
@@ -155,7 +155,7 @@ class WebApp:
             sort_by = [sort_by] + WebAppParameters.TIEBREAKERS + [sort_by + "_proj"]
         asc_list = [0] * len(sort_by)
 
-        st.title("NBA Stat Tracker for {}".format(today_dataset.date))
+        st.title("Game Schedule for {}".format(today_dataset.date))
 
         st.table(
             todays_games.reset_index()[
