@@ -56,9 +56,9 @@ def score_function(row):
     if row["period"] == 0:
         return "-"
     else:
-        if row["awayorhome"] == "home":
-            return str(row["away_score"]) + "-" + str(row["home_score"])
         if row["awayorhome"] == "away":
+            return str(row["away_score"]) + "-" + str(row["home_score"])
+        if row["awayorhome"] == "home":
             return str(row["home_score"]) + "-" + str(row["away_score"])
 
 
