@@ -1,9 +1,10 @@
-import streamlit as st
-import pandas as pd
 import time
-from data_fetchers.season.constants import SeasonParameters
+
+import pandas as pd
+import streamlit as st
 from nba_api.stats.endpoints import teamplayerdashboard
-from nba_api.stats.library.parameters import LastNGames
+
+from parameters import SeasonParameters
 
 
 # decoration to only run this once on first run, then get data from cache
@@ -22,9 +23,9 @@ def get_team_stats(team_id, date_from=SeasonParameters.START_DATE, date_to=Seaso
         last_n_games=str(last_n_games)
     )
     time.sleep(SeasonParameters.SLEEP_INTERVAL)
-    dict = team_player_dash.get_dict()
-    data = dict["resultSets"][1]["rowSet"]
-    columns = dict["resultSets"][1]["headers"]
+    tpd = team_player_dash.get_dict()
+    data = tpd["resultSets"][1]["rowSet"]
+    columns = tpd["resultSets"][1]["headers"]
     df_team = pd.DataFrame(data=data, columns=columns)
 
     # Change certain columns from total for season to an average

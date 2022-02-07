@@ -1,8 +1,8 @@
-from unicodedata import name
-from data_fetchers.topshot.constants import TopShotParameters
-import requests
-import pandas as pd
 import numpy as np
+import pandas as pd
+import requests
+
+from parameters import TopShotParameters
 
 
 def get_topshot_data():
@@ -16,7 +16,7 @@ def get_topshot_data():
 def filter_unreleased(topshot_df):
     # This function filters Low Asks = 0
     # which are new/unreleased moments then omits them
-    unreleased_filter = topshot_df["Low Ask"] != 0
+    unreleased_filter = topshot_df[TopShotParameters.LOW_ASK] != 0
     return topshot_df[unreleased_filter]
 
 
@@ -27,11 +27,12 @@ def get_cheapest_moment(topshot_df, filter_or=None, filter_and=None, tsd_backup=
     if filter_or is not None:
         topshot_cheap = topshot_cheap[np.logical_or.reduce([topshot_cheap[key] == filter_or[key] for key in filter_or])]
     if filter_and is not None:
-        topshot_cheap = topshot_cheap[np.logical_and.reduce([topshot_cheap[key] == filter_and[key] for key in filter_and])]
+        topshot_cheap = topshot_cheap[
+            np.logical_and.reduce([topshot_cheap[key] == filter_and[key] for key in filter_and])]
     # get the indices of lowest ask moment for each player and return full filtered dataframe
     if tsd_backup:
-        filter_not_tiers = ~topshot_df["Player Name"].isin(
-            topshot_cheap["Player Name"].unique()
+        filter_not_tiers = ~topshot_df[TopShotParameters.PLAYER_NAME].isin(
+            topshot_cheap[TopShotParameters.PLAYER_NAME].unique()
         )
         filter_tsd = topshot_df["Top Shot Debut"] == 1
         top_shot_debuts = topshot_df[filter_not_tiers][filter_tsd]
@@ -40,9 +41,10 @@ def get_cheapest_moment(topshot_df, filter_or=None, filter_and=None, tsd_backup=
         topshot_cheap = pd.concat([topshot_cheap, top_shot_debuts])
 
     topshot_cheap = (
-        topshot_cheap[["Player Name", "Low Ask"]].groupby(["Player Name"]).idxmin()
+        topshot_cheap[[TopShotParameters.PLAYER_NAME, TopShotParameters.LOW_ASK]].groupby(
+            [TopShotParameters.PLAYER_NAME]).idxmin()
     )
-    idx_list = topshot_cheap["Low Ask"].to_list()
+    idx_list = topshot_cheap[TopShotParameters.LOW_ASK].to_list()
     low_ask_df = topshot_df.loc[idx_list]
 
     return low_ask_df

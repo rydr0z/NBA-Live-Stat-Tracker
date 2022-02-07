@@ -1,9 +1,9 @@
 from data_combine.utils import combine_data, clean_and_create_columns
+from data_fetchers.injuries.injuryreport import InjuryReport
 from data_fetchers.live.livestatfetcher import LiveStats
 from data_fetchers.season.seasonstatfetcher import SeasonStats
 from data_fetchers.todaysgames.todaysgamesfetcher import TodaysGames
 from data_fetchers.topshot.topshotfetcher import TopShotData
-from data_fetchers.injuries.injuryreport import InjuryReport
 
 
 class CombinedStats:
@@ -12,7 +12,6 @@ class CombinedStats:
         tg = TodaysGames()
         self.todays_games_df = tg.todays_games
         self.date = tg.date
-        #self.games_df, self.date_prev = tg.get_games_on_date([(2022, 1, 28), (2022, 1, 29)])
         ls = LiveStats(todays_games=self.todays_games_df)
         ss = SeasonStats(todays_games=self.todays_games_df, games_df=games_df, date=date, last_n_games=last_n_games)
         td = TopShotData()

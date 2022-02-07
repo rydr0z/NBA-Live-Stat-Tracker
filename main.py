@@ -1,9 +1,8 @@
-from webapp.webapp import WebApp
+from webapp.webapp import run_webapp
 
 
 def main():
-    webapp = WebApp()
-    webapp.run_webapp()
+    run_webapp()
     print("Starting NBA Stats WebApp")
 
 

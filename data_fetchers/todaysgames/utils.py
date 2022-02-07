@@ -1,9 +1,10 @@
-import pandas as pd
 from datetime import datetime
-from data_fetchers.todaysgames.constants import TodayParameters
+
+import pandas as pd
 from nba_api.live.nba.endpoints import scoreboard
 from nba_api.stats.endpoints import scoreboardv2
-from nba_api.stats.library.parameters import GameDate
+
+from parameters import TodayParameters
 
 
 def get_todays_games():
@@ -17,8 +18,8 @@ def get_todays_games():
 
     # loop through today's games, get revelant teams, game clock and scores
     for i, game in enumerate(games):
-        awayId = game["awayTeam"]["teamId"]
-        homeId = game["homeTeam"]["teamId"]
+        away_id = game["awayTeam"]["teamId"]
+        home_id = game["homeTeam"]["teamId"]
 
         game_id = game["gameId"]
 
@@ -47,9 +48,9 @@ def get_todays_games():
         todays_games = todays_games.append(
             {
                 "away_team": away,
-                "away_id": awayId,
+                "away_id": away_id,
                 "home_team": home,
-                "home_id": homeId,
+                "home_id": home_id,
                 "period": period,
                 "game_clock": game_clock,
                 "away_score": away_score,

@@ -1,7 +1,6 @@
-import pandas as pd
-import streamlit as st
 import numpy as np
-from data_combine.constants import CombinedParameters
+
+from parameters import CombinedParameters
 
 
 def combine_data(todays_games_df, daily_stats_df, season_stats_df, topshot_data_df, injury_report_df,
@@ -56,9 +55,9 @@ def score_function(row):
     if row["period"] == 0:
         return "-"
     else:
-        if row["awayorhome"] == "home":
-            return str(row["away_score"]) + "-" + str(row["home_score"])
         if row["awayorhome"] == "away":
+            return str(row["away_score"]) + "-" + str(row["home_score"])
+        if row["awayorhome"] == "home":
             return str(row["home_score"]) + "-" + str(row["away_score"])
 
 
@@ -76,7 +75,7 @@ def on_court_function(row):
     if row["injury_status"] is not np.nan:
         return row["injury_status"]
     elif row["period"] == 0 or row["game_status"] == "Final" or row["game_status"] == "Final/OT":
-        return "-"
+        return "Final"
     else:
         if row["on_court"] == "1":
             return "In Game"
@@ -103,8 +102,6 @@ def clean_and_create_columns(df):
 
     time_to_float(df)
 
-    away_index = df["awayorhome"] == "home"
-    home_index = df["awayorhome"] == "away"
     df["away_score"].fillna(0, inplace=True)
     df["home_score"].fillna(0, inplace=True)
 
