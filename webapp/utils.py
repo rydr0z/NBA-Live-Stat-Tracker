@@ -39,6 +39,26 @@ def get_top_stats_each_game(df, todays_games, stat, tiebreakers):
     return list_largest
 
 
+def get_first_to_stats_each_team(df, todays_games, stat, threshold):
+    # sort by tiebreakers first
+    # (team point differential -> plus minus -> minutes)
+    list_first = pd.DataFrame()
+    teams = pd.concat([todays_games['away_team'], todays_games['home_team']]).unique()
+    list_largest = pd.DataFrame()
+    for team in teams:
+        df_game = df.xs(team, level=1, drop_level=False)
+        df_game = df_game.dropna(axis=0, subset=["set_easy"])[[stat]]
+        largest = df_game.sort_values(by=stat, ascending=False)[:1]
+        first = df_game[df_game[stat] == threshold]
+        if ~first.index.isin(list_first.index).any():
+            list_first = pd.concat([list_first, first])
+        list_largest = pd.concat([list_largest, largest])
+    list_largest = list_largest[
+        ~list_largest.index.get_level_values(level=1).isin(list_first.index.get_level_values(level=1))]
+    list_return = pd.concat([list_first, list_largest])
+    return list_return
+
+
 def bg_color(col, list_top):
     pd.options.display.precision = 2
     pd.options.display.float_format = "{:,.2f}".format
@@ -161,7 +181,7 @@ def set_defaults(challenge):
 
 def create_sidebar(columns, season_avg_columns, len_df):
     challenge = st.sidebar.checkbox(
-        "Check here to view current NBA TopShot challenge", value=WebAppParameters.CHALLENGE_NOW
+        "Check here to view current NBA Top Shot challenge", value=WebAppParameters.CHALLENGE_NOW
     )
     last_n_games = st.sidebar.selectbox(
         "Use season averages from the last __ games",
@@ -192,7 +212,7 @@ def create_sidebar(columns, season_avg_columns, len_df):
         columns,
     )
 
-    if WebAppParameters.TOP_STATS_OVERALL:
+    if WebAppParameters.TOP_STATS == "top_overall":
         how_many = st.sidebar.slider(
             "Highlight the top __ players in sorted categories",
             min_value=0,
@@ -200,6 +220,8 @@ def create_sidebar(columns, season_avg_columns, len_df):
             value=WebAppParameters.NUM_HIGHLIGHTED,
             step=1,
         )
+    else:
+        how_many = 1
 
     # Button to refresh live data
     st.sidebar.button("Click Here to Refresh Live Data")

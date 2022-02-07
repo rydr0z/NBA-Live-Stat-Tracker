@@ -259,8 +259,8 @@ class TopShotParameters:
         "Set",
         "Tier",
     ]
-    FILTER_EASY = {"Series": "1", "Series": "2"}
-    FILTER_HARD = {"Top Shot Debut": 1}  # Tier": "Rare", "Tier": "Legendary"
+    FILTER_EASY = None  # {"Series": "1", "Series": "2"}
+    FILTER_HARD = None  # {"Top Shot Debut": 1}  # Tier": "Rare", "Tier": "Legendary"
     PLAYER_NAME = "Player Name"
     LOW_ASK = "Low Ask"
     INTEGER_COLUMNS = ["count_easy", "low_ask_easy", "count_hard", "low_ask_hard"]
@@ -316,15 +316,11 @@ class WebAppParameters:
     AUTO_REFRESH_INTERVAL = 60000  # 1 minute
     AUTO_REFRESH_LIMIT = 120
     ADDITIONAL_DAY_PATH = "prevgamedays/2022-01-2122_NBAStats_edited.csv"
-    CHALLENGE_CATS = ["pts", "reb", "ast"]
-    CHALLENGE_NOW = False
-    CHALLENGE_NAME = "### Flash Challenge: 'Day by Day' "
-    CHALLENGE_DESC_EASY = ">Create a Challenge Entry with exactly nine (9) Moment™ NFTs. The nine Moments include: 3 " \
-                          "Moments from the players that lead in points each day on Friday, Saturday and Sunday; 3 " \
-                          "Moments from the players that lead in rebounds each day on Friday, Saturday and Sunday; 3 " \
-                          "Moments from the players that lead in assists each day on Friday, Saturday and Sunday. " \
-                          "These Moments must be Series 1 or Series 2 Moments. If the player does not have a Series 1 " \
-                          "or Series 2 Moment then you must use their Top Shot Debut. "
+    CHALLENGE_CATS = ["reb"]
+    CHALLENGE_NOW = True
+    CHALLENGE_NAME = "### Flash Challenge: 'Five Boards' "
+    CHALLENGE_DESC_EASY = ">Create a Challenge Entry featuring the first player to grab five rebounds from each team " \
+                          "in games played on Feb 7, 2022. Each game will have two players for your Challenge Entry. "
 
     CHALLENGE_DESC_HARD = None
     CSS_PATH = "frontend/css/streamlit.css"
@@ -338,10 +334,10 @@ class WebAppParameters:
     TIEBREAKERS = ["differential", "plus_minus", "min"]
     TS_EASY_CATS = ["easy_moment", "count_easy", "low_ask_easy", "4hchange_easy"]
     TS_HARD_CATS = ["hard_moment", "count_hard", "low_ask_hard", "4hchange_hard"]
-    TOPSHOT_CATEGORIES = TS_EASY_CATS + TS_HARD_CATS
-    TOP_STATS_OVERALL = True
-    TOP_STATS_PER_GAME = False
+    TOPSHOT_CATEGORIES = TS_EASY_CATS  # + TS_HARD_CATS
+    TOP_STATS = "first_each"  # "top_overall", "top_each",
     CHALLENGE_LEADERS = pd.Index(["Caris LeVert", "Jarrett Allen", "Luka Doncic", "RJ Barrett", "Anthony Davis",
                                   "Tyrese Haliburton"])
     LAST_N_GAMES_OPTIONS = ["All", 30, 14, 7]
     DEFAULT_N_GAMES = 14
+    FIRST_TO_THRESHOLD = 5

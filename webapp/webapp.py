@@ -5,7 +5,7 @@ from streamlit_autorefresh import st_autorefresh
 from data_combine.combinedata import CombinedStats
 from parameters import WebAppParameters
 from webapp.utils import get_top_stats, get_top_stats_each_game, bg_color, add_subtract_stat, run_projections, \
-    save_dataframe, create_sidebar
+    save_dataframe, create_sidebar, get_first_to_stats_each_team
 
 
 def run_webapp():
@@ -27,7 +27,6 @@ def run_webapp():
 
     today_dataset = CombinedStats(last_n_games=WebAppParameters.DEFAULT_N_GAMES)
     df = today_dataset.stats
-    topshot_moments = today_dataset.topshot_data_df
     todays_games = today_dataset.todays_games_df
     start_times = todays_games["start_time"].to_list()
     len_df = df.shape[0]
@@ -95,22 +94,24 @@ def run_webapp():
         list_top = None
 
         for cat in WebAppParameters.CHALLENGE_CATS:
-            if WebAppParameters.TOP_STATS_OVERALL:
+            if WebAppParameters.TOP_STATS == "top_overall":
                 add_to_list = get_top_stats(df, how_many, cat, WebAppParameters.TIEBREAKERS)
-            else:
+            elif WebAppParameters.TOP_STATS == "top_each":
                 add_to_list = get_top_stats_each_game(df, todays_games, cat, WebAppParameters.TIEBREAKERS)
+            elif WebAppParameters.TOP_STATS == "first_each":
+                add_to_list = get_first_to_stats_each_team(df, todays_games, cat, WebAppParameters.FIRST_TO_THRESHOLD)
             list_top = pd.concat([list_top, add_to_list])
 
         if start_times[0] < today_dataset.now:
             sort_by = [sort_by] + WebAppParameters.TIEBREAKERS
         else:
             sort_by = [sort_by] + WebAppParameters.TIEBREAKERS + [sort_by + "_proj"]
-        df_all_challenge = topshot_moments[topshot_moments.index.isin(WebAppParameters.CHALLENGE_LEADERS)][
-            WebAppParameters.TOPSHOT_CATEGORIES]
+        # df_all_challenge = topshot_moments[topshot_moments.index.isin(WebAppParameters.CHALLENGE_LEADERS)][
+        #    WebAppParameters.TOPSHOT_CATEGORIES]
         df_top = df[df.index.isin(list_top.index)][options + WebAppParameters.TOPSHOT_CATEGORIES]
 
-        st.write("### Friday Feb 4 & Saturday Feb 5 Challenge Moments")
-        st.dataframe(df_all_challenge)
+        # st.write("### Friday Feb 4 & Saturday Feb 5 Challenge Moments")
+        # st.dataframe(df_all_challenge)
         st.write("### Today's Challenge Leaders")
         if start_times[0] < today_dataset.now:
             st.dataframe(df_top)
@@ -125,7 +126,7 @@ def run_webapp():
         "*OT periods add an additional 5 minutes to time remaining in game and projection is adjusted if OT is reached."
         " Players with INJ status are projected 0 in all statistics."
     )
-    df = df.sort_values(sort_by, ascending=[0] * len([sort_by]))[categories]
+    df = df.sort_values(sort_by, ascending=[0] * len(sort_by))[categories]
     # Options for Pandas DataFrame Style
     if count % 1 == 0 or count == 0:
         # if datetime.now > today_dataset.start_times[-1] + timedelta(hours=3):
