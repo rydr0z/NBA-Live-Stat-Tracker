@@ -1,3 +1,4 @@
+import os.path
 from datetime import datetime
 
 import numpy as np
@@ -42,7 +43,13 @@ def get_top_stats_each_game(df, todays_games, stat, tiebreakers):
 def get_first_to_stats_each_team(df, todays_games, stat, threshold):
     # sort by tiebreakers first
     # (team point differential -> plus minus -> minutes)
-    list_first = pd.DataFrame()
+    if os.path.isfile('list_first.pkl'):
+        list_first = pd.read_pickle("list_first.pkl")
+    else:
+        list_first = pd.DataFrame(columns=["name", "team"])
+        list_first["name"] = ["Pascal Siakam", "PJ Washington", "Bam Adebayo", "Jae Crowder"]
+        list_first["team"] = ["TOR", "CHA", "MIA", "PHX"]
+        list_first.set_index(["name", "team"], inplace=True)
     teams = pd.concat([todays_games['away_team'], todays_games['home_team']]).unique()
     list_largest = pd.DataFrame()
     for team in teams:
@@ -50,12 +57,13 @@ def get_first_to_stats_each_team(df, todays_games, stat, threshold):
         df_game = df_game.dropna(axis=0, subset=["set_easy"])[[stat]]
         largest = df_game.sort_values(by=stat, ascending=False)[:1]
         first = df_game[df_game[stat] == threshold]
-        if ~first.index.isin(list_first.index).any():
+        if ~first.index.get_level_values(level=1).isin(list_first.index.get_level_values(level=1)).any():
             list_first = pd.concat([list_first, first])
         list_largest = pd.concat([list_largest, largest])
     list_largest = list_largest[
         ~list_largest.index.get_level_values(level=1).isin(list_first.index.get_level_values(level=1))]
     list_return = pd.concat([list_first, list_largest])
+    list_first.to_pickle("list_first.pkl")
     return list_return
 
 
