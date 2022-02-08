@@ -1,9 +1,8 @@
-import os.path
+import os
 from datetime import datetime
 
 import numpy as np
 import pandas as pd
-import streamlit as st
 
 from parameters import WebAppParameters
 
@@ -47,8 +46,8 @@ def get_first_to_stats_each_team(df, todays_games, stat, threshold):
         list_first = pd.read_pickle("list_first.pkl")
     else:
         list_first = pd.DataFrame(columns=["name", "team"])
-        list_first["name"] = ["Pascal Siakam", "PJ Washington", "Bam Adebayo", "Jae Crowder"]
-        list_first["team"] = ["TOR", "CHA", "MIA", "PHX"]
+        list_first['name'] = WebAppParameters.CHALLENGE_LEADERS
+        list_first['team'] = WebAppParameters.CHALLENGE_LEADERS_TEAMS
         list_first.set_index(["name", "team"], inplace=True)
     teams = pd.concat([todays_games['away_team'], todays_games['home_team']]).unique()
     list_largest = pd.DataFrame()
@@ -114,45 +113,52 @@ def import_additional_day(df):
 
 
 def add_subtract_stat(df, add_categories, sub_categories):
-    add_categories_str = "+".join(add_categories)
-    sub_categories_str = "-".join(sub_categories)
+    if add_categories is not None:
+        if len(add_categories) > 1:
+            add_categories_str = "+".join(add_categories)
+            df[add_categories_str] = 0
 
-    if add_categories:
-        df[add_categories_str] = 0
+            for cat in add_categories:
+                df[add_categories_str] += df[cat]
+    if sub_categories is not None:
+        if len(sub_categories) > 1:
+            sub_categories_str = "-".join(sub_categories)
 
-        for cat in add_categories:
-            df[add_categories_str] += df[cat]
+            df[sub_categories_str] = df[sub_categories[0]]
 
-    if sub_categories:
-        df[sub_categories_str] = df[sub_categories[0]]
-
-        for cat in sub_categories:
-            if cat != sub_categories[0]:
-                df[sub_categories_str] -= df[cat]
+            for cat in sub_categories:
+                if cat != sub_categories[0]:
+                    df[sub_categories_str] -= df[cat]
 
 
 def run_projections(df, options, add_categories, sub_categories):
-    add_categories_str = "+".join(add_categories)
-    sub_categories_str = "-".join(sub_categories)
+    options_operations = []
+    if add_categories is not None:
+        if len(add_categories) > 1:
+            add_categories_str = "+".join(add_categories)
+            df[add_categories_str + "_proj"] = 0
+            for cat in add_categories:
+                df[add_categories_str + "_proj"] += df.apply(project_stat, stat=cat, axis=1)
+            options_operations.append(add_categories_str)
+    if sub_categories is not None:
+        if len(sub_categories) > 1:
+            sub_categories_str = "-".join(sub_categories)
+            df[sub_categories_str + "_proj"] = 0
+            for cat in sub_categories:
+                if cat == sub_categories[0]:
+                    df[sub_categories_str + "_proj"] = df.apply(
+                        project_stat, stat=cat, axis=1
+                    )
+                else:
+                    df[sub_categories_str + "_proj"] -= df.apply(
+                        project_stat, stat=cat, axis=1
+                    )
+            options_operations.append(sub_categories_str)
 
     for option in options:
         df[option + "_proj"] = df.apply(project_stat, stat=option, axis=1)
 
-    if add_categories or sub_categories:
-        df[add_categories_str + "_proj"] = 0
-        df[sub_categories_str + "_proj"] = 0
-        for cat in add_categories:
-            df[add_categories_str + "_proj"] += df.apply(project_stat, stat=cat, axis=1)
-        for cat in sub_categories:
-            if cat == sub_categories[0]:
-                df[sub_categories_str + "_proj"] = df.apply(
-                    project_stat, stat=cat, axis=1
-                )
-            else:
-                df[sub_categories_str + "_proj"] -= df.apply(
-                    project_stat, stat=cat, axis=1
-                )
-    options = [add_categories_str, sub_categories_str] + options
+    options = options_operations + options
     options = list(filter(None, options))
 
     options_proj = [x + "_proj" for x in options]
@@ -176,62 +182,3 @@ def add_additional_stats(df, additional_stats, stat):
         df[stat + "_total"] = df[stat]
         df[stat + "_total"] += additional_stats[stat]
         df.loc[df[stat + "_total"].isna(), stat + "_total"] = df[stat]
-
-
-def set_defaults(challenge):
-    if challenge:
-        stat_categories = WebAppParameters.CHALLENGE_CATS
-    else:
-        stat_categories = WebAppParameters.DEFAULT_STAT_CATS
-
-    return stat_categories
-
-
-def create_sidebar(columns, season_avg_columns, len_df):
-    challenge = st.sidebar.checkbox(
-        "Check here to view current NBA Top Shot challenge", value=WebAppParameters.CHALLENGE_NOW
-    )
-    last_n_games = st.sidebar.selectbox(
-        "Use season averages from the last __ games",
-        WebAppParameters.LAST_N_GAMES_OPTIONS,
-        WebAppParameters.LAST_N_GAMES_OPTIONS.index(WebAppParameters.DEFAULT_N_GAMES),
-    )
-    if last_n_games == "All":
-        last_n_games = 0
-
-    stat_categories = set_defaults(challenge)
-
-    options = st.sidebar.multiselect(
-        "Which live game stats are you interested in?", columns, stat_categories
-    )
-
-    season_avg_options = st.sidebar.multiselect(
-        "Which season average stats are you interested in?", season_avg_columns
-    )
-
-    # create a multiselect option for adding multiple categories (cat1 + cat2 + cat3...)
-    add_categories = st.sidebar.multiselect(
-        "Do you want to add up any categories?", columns
-    )
-
-    # create multiselect option for subtracting categories (cat1 - cat2 - cat3...)
-    sub_categories = st.sidebar.multiselect(
-        "Do you want to subtract any categories? Categories are subtracted from the first listed",
-        columns,
-    )
-
-    if WebAppParameters.TOP_STATS == "top_overall":
-        how_many = st.sidebar.slider(
-            "Highlight the top __ players in sorted categories",
-            min_value=0,
-            max_value=len_df,
-            value=WebAppParameters.NUM_HIGHLIGHTED,
-            step=1,
-        )
-    else:
-        how_many = 1
-
-    # Button to refresh live data
-    st.sidebar.button("Click Here to Refresh Live Data")
-
-    return options, season_avg_options, add_categories, sub_categories, how_many, challenge

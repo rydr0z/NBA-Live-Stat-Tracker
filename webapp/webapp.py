@@ -4,8 +4,9 @@ from streamlit_autorefresh import st_autorefresh
 
 from data_combine.combinedata import CombinedStats
 from parameters import WebAppParameters
+from webapp.sidebar import create_sidebar
 from webapp.utils import get_top_stats, get_top_stats_each_game, bg_color, add_subtract_stat, run_projections, \
-    save_dataframe, create_sidebar, get_first_to_stats_each_team
+    save_dataframe, get_first_to_stats_each_team
 
 
 def run_webapp():
@@ -40,9 +41,6 @@ def run_webapp():
     options, season_avg_options, add_categories, sub_categories, how_many, challenge = create_sidebar(columns,
                                                                                                       season_avg_columns,
                                                                                                       len_df)
-
-    # Create a multiselect option for individual categories and generate prediction for each option selected
-
     options, options_proj = run_projections(
         df, options, add_categories, sub_categories
     )
@@ -58,10 +56,11 @@ def run_webapp():
     # Multiple categories selected for adding and subtracting
     if todays_games["game_status"].str.contains("Final").all():
         options_proj = []
+    if season_avg_options is not None:
+        options = options + season_avg_options
     categories = (
             WebAppParameters.DEFAULT_CATS
             + options
-            + season_avg_options
             + options_proj
             + [x for x in WebAppParameters.TIEBREAKERS if x != "min"]
             + WebAppParameters.TOPSHOT_CATEGORIES
@@ -89,8 +88,6 @@ def run_webapp():
     )
 
     if challenge:
-        st.write(WebAppParameters.CHALLENGE_NAME)
-        st.write(WebAppParameters.CHALLENGE_DESC_EASY)
         list_top = None
 
         for cat in WebAppParameters.CHALLENGE_CATS:
@@ -126,7 +123,8 @@ def run_webapp():
         "*OT periods add an additional 5 minutes to time remaining in game and projection is adjusted if OT is reached."
         " Players with INJ status are projected 0 in all statistics."
     )
-    df = df.sort_values(sort_by, ascending=[0] * len(sort_by))[categories]
+
+    df = df.sort_values(sort_by, ascending=False)[categories]
     # Options for Pandas DataFrame Style
     if count % 1 == 0 or count == 0:
         # if datetime.now > today_dataset.start_times[-1] + timedelta(hours=3):

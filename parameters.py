@@ -309,18 +309,14 @@ class TopShotParameters:
     URL = "https://otmnft.com/create_moments_csv/?playerName=&setName=&team=&minprice=&maxprice=&mincirc=&maxcirc=&sortby="
 
 
-import pandas as pd
-
-
 class WebAppParameters:
     AUTO_REFRESH_INTERVAL = 60000  # 1 minute
     AUTO_REFRESH_LIMIT = 120
     ADDITIONAL_DAY_PATH = "prevgamedays/2022-01-2122_NBAStats_edited.csv"
-    CHALLENGE_CATS = ["reb"]
+    CHALLENGE_CATS = ["pts"]
     CHALLENGE_NOW = True
-    CHALLENGE_NAME = "### Flash Challenge: 'Five Boards' "
-    CHALLENGE_DESC_EASY = ">Create a Challenge Entry featuring the first player to grab five rebounds from each team " \
-                          "in games played on Feb 7, 2022. Each game will have two players for your Challenge Entry. "
+    CHALLENGE_NAME = "### WEEKLY Flash Challenge: 'NO DAYS OFF' "
+    CHALLENGE_DESC_EASY = ">Tuesday, Feb. 8 - Player with the most points."
 
     CHALLENGE_DESC_HARD = None
     CSS_PATH = "frontend/css/streamlit.css"
@@ -335,9 +331,10 @@ class WebAppParameters:
     TS_EASY_CATS = ["easy_moment", "count_easy", "low_ask_easy", "4hchange_easy"]
     TS_HARD_CATS = ["hard_moment", "count_hard", "low_ask_hard", "4hchange_hard"]
     TOPSHOT_CATEGORIES = TS_EASY_CATS  # + TS_HARD_CATS
-    TOP_STATS = "first_each"  # "top_overall", "top_each",
-    CHALLENGE_LEADERS = pd.Index(["Caris LeVert", "Jarrett Allen", "Luka Doncic", "RJ Barrett", "Anthony Davis",
-                                  "Tyrese Haliburton"])
+    TOP_STATS = "top_overall"  # "first_each", "top_each",
+    CHALLENGE_LEADERS = ["Pascal Siakam", "PJ Washington", "Bam Adebayo", "Spencer Dinwiddie", "Jae Crowder",
+                         "Nikola Vucevic", "Kevon Looney", "Josh Giddey", "Mitchell Robinson", "Hassan Whiteside"]
+    CHALLENGE_LEADERS_TEAMS = ["TOR", "CHA", "MIA", "WSH", "PHX", "CHI", "GSW", "OKC", "NYK", "UTA"]
     LAST_N_GAMES_OPTIONS = ["All", 30, 14, 7]
     DEFAULT_N_GAMES = 14
     FIRST_TO_THRESHOLD = 5

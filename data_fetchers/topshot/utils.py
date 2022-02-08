@@ -84,9 +84,7 @@ def combine_topshot_data(raw_data):
     # Removes any accents from names, so that they can be
     # matched with NBA Player Names
     topshot_data.name = (
-        topshot_data.name.str.normalize("NFKD")
-            .str.encode("ascii", errors="ignore")
-            .str.decode("utf-8")
+        topshot_data.name.str.normalize("NFKD").str.encode("ascii", errors="ignore").str.decode("utf-8")
     )
     topshot_data.name.astype(str)
 

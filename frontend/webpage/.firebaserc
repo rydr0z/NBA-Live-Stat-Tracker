@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "default": "nba-live-dashboard",
+    "nba-live-dashboard": "nba-live-dashboard"
+  },
+  "targets": {}
+}
