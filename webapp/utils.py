@@ -47,8 +47,6 @@ def get_first_to_stats_each_team(df, todays_games, stat, threshold):
         list_first = pd.read_pickle("list_first.pkl")
     else:
         list_first = pd.DataFrame(columns=["name", "team"])
-        list_first["name"] = ["Pascal Siakam", "PJ Washington", "Bam Adebayo", "Jae Crowder"]
-        list_first["team"] = ["TOR", "CHA", "MIA", "PHX"]
         list_first.set_index(["name", "team"], inplace=True)
     teams = pd.concat([todays_games['away_team'], todays_games['home_team']]).unique()
     list_largest = pd.DataFrame()
