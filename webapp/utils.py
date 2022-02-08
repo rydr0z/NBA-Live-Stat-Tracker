@@ -87,7 +87,7 @@ def project_stat(row, stat):
     period = row["period"]
     if game_clock == "Final" or game_clock == "Final/OT":
         return float(curr_stat)
-    elif avg_min == 0 or avg_min == np.nan or "INJ" in str(inj):
+    elif avg_min == 0 or avg_min == np.nan or "INJ" in str(inj) or "OUT" in str(inj):
         return 0.0
     elif clock == np.nan or type(clock) == float or period == 0 or clock == "":
         return float(avg_stat)
