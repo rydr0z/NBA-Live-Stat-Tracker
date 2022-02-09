@@ -313,10 +313,15 @@ class WebAppParameters:
     AUTO_REFRESH_INTERVAL = 60000  # 1 minute
     AUTO_REFRESH_LIMIT = 120
     ADDITIONAL_DAY_PATH = "prevgamedays/2022-01-2122_NBAStats_edited.csv"
-    CHALLENGE_CATS = ["pts"]
+    CHALLENGE_CATS = ["ast"]
     CHALLENGE_NOW = True
     CHALLENGE_NAME = "### WEEKLY Flash Challenge: 'NO DAYS OFF' "
-    CHALLENGE_DESC_EASY = ">Tuesday, Feb. 8 - Player with the most points."
+    CHALLENGE_DESC_EASY = "On Monday, Feb. 7, you'll need any Moment from the NBA player with the most points.  \n " \
+                          "On Tuesday, Feb. 8, you'll need any Moment from the NBA player with the most points.  \n " \
+                          "On **Wednesday, Feb. 9**, you'll need any Moment from the NBA player with the most assists.  \n " \
+                          "On Thursday, Feb. 10, you'll need any Moment from the NBA player with the most assists.  \n " \
+                          "On Friday, Feb. 11, you'll need any Moment from the NBA player with the most rebounds.  \n " \
+                          "On Saturday, Feb. 12, you'll need any Moment from the NBA player with the most rebound"
 
     CHALLENGE_DESC_HARD = None
     CHALLENGE_SEASON_AVG_OPTIONS = None

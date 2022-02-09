@@ -116,13 +116,11 @@ def run_webapp():
             st.write("Today's games have not started yet.")
 
     st.title("Complete Leaderboard")
-    st.write("**Projections are calculated as:**")
-    st.write(
-        "*live stat + ( stat average over games specified in sidebar \* mins remaining in game )*")
-    st.write(
-        "*OT periods add an additional 5 minutes to time remaining in game and projection is adjusted if OT is reached."
-        " Players with INJ status are projected 0 in all statistics."
-    )
+    st.write("**Projections are calculated as:**  \n" \
+             "*live stat + ( stat average over games specified in sidebar \* mins remaining in game )*  \n" \
+             "*OT periods add an additional 5 minutes to time remaining in game and projection is adjusted if OT is reached.  \n" \
+             "Players with INJ or OUT injury status are projected 0 in all statistics."
+             )
 
     df = df.sort_values(sort_by, ascending=False)[categories]
     # Options for Pandas DataFrame Style
