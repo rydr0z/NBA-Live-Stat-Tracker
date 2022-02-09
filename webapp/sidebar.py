@@ -53,16 +53,16 @@ def create_sidebar(columns, season_avg_columns, len_df):
                 "Highlight the top __ players in sorted categories",
                 min_value=0,
                 max_value=len_df,
-                value=WebAppParameters.NUM_HIGHLIGHTED,
+                value=0,
                 step=1,
             )
         else:
             how_many = 1
     else:
         options = stat_categories
-        season_avg_options = None
-        add_categories = None
-        sub_categories = None
-        how_many = 0
+        season_avg_options = WebAppParameters.CHALLENGE_SEASON_AVG_OPTIONS
+        add_categories = WebAppParameters.CHALLENGE_ADD_CATEGORIES
+        sub_categories = WebAppParameters.CHALLENGE_SUB_CATEGORIES
+        how_many = WebAppParameters.CHALLENGE_NUM_HIGHLIGHTED
 
     return options, season_avg_options, add_categories, sub_categories, how_many, challenge

@@ -319,13 +319,16 @@ class WebAppParameters:
     CHALLENGE_DESC_EASY = ">Tuesday, Feb. 8 - Player with the most points."
 
     CHALLENGE_DESC_HARD = None
+    CHALLENGE_SEASON_AVG_OPTIONS = None
+    CHALLENGE_ADD_CATEGORIES = None
+    CHALLENGE_SUB_CATEGORIES = None
     CSS_PATH = "frontend/css/streamlit.css"
     DEFAULT_CATS = ["min", "on_court"]
     DEFAULT_STAT_CATS = ["pts", "reb", "ast", "stl", "blk", "tov"]
     FILE_NAME_SAVE = "_NBAStats.csv"
     IMPORT_ADDITIONAL_DAY = False
     LOGO_PATH = "frontend/nba_logo.png"
-    NUM_HIGHLIGHTED = 1
+    CHALLENGE_NUM_HIGHLIGHTED = 1
     PATH_SAVE = "data/prevgamedays/"
     TIEBREAKERS = ["differential", "plus_minus", "min"]
     TS_EASY_CATS = ["easy_moment", "count_easy", "low_ask_easy", "4hchange_easy"]
