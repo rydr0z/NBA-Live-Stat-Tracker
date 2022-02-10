@@ -15,7 +15,7 @@ Web App available at: https://share.streamlit.io/rydr0/nba-live-stat-tracker/mai
 
 ## Screenshots
 
-![App Screenshot](https://i.imgur.com/Qv7wEfu.png)
+![App Screenshot](https://i.imgur.com/mfVhoin.png)
 
 
 ## Deployment
