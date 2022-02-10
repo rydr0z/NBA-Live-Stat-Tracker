@@ -3,7 +3,7 @@
 
 Python scripts to fetch stats from NBA API, scrape additional information from web and display in an interactive streamlit dashboard.
 
-Web App available at: https://share.streamlit.io/rydr0/nba-live-stat-tracker/main/main.py
+Web App available at: https://nbalivedashboard.rydr.ca/
 
 
 
