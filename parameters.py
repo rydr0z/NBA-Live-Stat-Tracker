@@ -1,3 +1,4 @@
+import pandas as pd
 import pytz
 from nba_api.stats.library.parameters import GameDate
 
@@ -318,11 +319,17 @@ class WebAppParameters:
     CHALLENGE_NAME = "### WEEKLY Flash Challenge: 'NO DAYS OFF' "
     CHALLENGE_DESC_EASY = "On Monday, Feb. 7, you'll need any Moment from the NBA player with the most points.  \n " \
                           "On Tuesday, Feb. 8, you'll need any Moment from the NBA player with the most points.  \n " \
-                          "On **Wednesday, Feb. 9**, you'll need any Moment from the NBA player with the most assists.  \n " \
-                          "On Thursday, Feb. 10, you'll need any Moment from the NBA player with the most assists.  \n " \
+                          "On Wednesday, Feb. 9, you'll need any Moment from the NBA player with the most assists.  \n " \
+                          "On **Thursday, Feb. 10**, you'll need any Moment from the NBA player with the most assists.  \n " \
                           "On Friday, Feb. 11, you'll need any Moment from the NBA player with the most rebounds.  \n " \
                           "On Saturday, Feb. 12, you'll need any Moment from the NBA player with the most rebound"
-
+    CHALLENGE_PREV = pd.DataFrame({
+        "date": ["Monday Feb 7", "Tuesday Feb 8", "Wednesday Feb 9"],
+        "category": ["pts", "pts", "ast"],
+        "amount": [38, 44, 11],
+        "name": ["Devin Booker", "Giannis Antetokounmpo", "Dennis Smith Jr"],
+        "team": ["PHX", "MIL", "POR"]
+    }).set_index(['name', 'team'])
     CHALLENGE_DESC_HARD = None
     CHALLENGE_SEASON_AVG_OPTIONS = None
     CHALLENGE_ADD_CATEGORIES = None

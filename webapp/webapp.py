@@ -109,6 +109,8 @@ def run_webapp():
 
         # st.write("### Friday Feb 4 & Saturday Feb 5 Challenge Moments")
         # st.dataframe(df_all_challenge)
+        st.write("### Previous Day Challenge Leaders")
+        st.dataframe(WebAppParameters.CHALLENGE_PREV)
         st.write("### Today's Challenge Leaders")
         if start_times[0] < today_dataset.now:
             st.dataframe(df_top)
