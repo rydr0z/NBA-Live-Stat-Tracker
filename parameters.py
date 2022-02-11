@@ -1,3 +1,4 @@
+import pandas as pd
 import pytz
 from nba_api.stats.library.parameters import GameDate
 
@@ -259,8 +260,8 @@ class TopShotParameters:
         "Set",
         "Tier",
     ]
-    FILTER_EASY = {"Series": "1", "Series": "2"}
-    FILTER_HARD = {"Top Shot Debut": 1}  # Tier": "Rare", "Tier": "Legendary"
+    FILTER_EASY = None  # {"Series": "1", "Series": "2"}
+    FILTER_HARD = None  # {"Top Shot Debut": 1}  # Tier": "Rare", "Tier": "Legendary"
     PLAYER_NAME = "Player Name"
     LOW_ASK = "Low Ask"
     INTEGER_COLUMNS = ["count_easy", "low_ask_easy", "count_hard", "low_ask_hard"]
@@ -309,39 +310,46 @@ class TopShotParameters:
     URL = "https://otmnft.com/create_moments_csv/?playerName=&setName=&team=&minprice=&maxprice=&mincirc=&maxcirc=&sortby="
 
 
-import pandas as pd
-
-
 class WebAppParameters:
     AUTO_REFRESH_INTERVAL = 60000  # 1 minute
     AUTO_REFRESH_LIMIT = 120
     ADDITIONAL_DAY_PATH = "prevgamedays/2022-01-2122_NBAStats_edited.csv"
-    CHALLENGE_CATS = ["pts", "reb", "ast"]
-    CHALLENGE_NOW = False
-    CHALLENGE_NAME = "### Flash Challenge: 'Day by Day' "
-    CHALLENGE_DESC_EASY = ">Create a Challenge Entry with exactly nine (9) Moment™ NFTs. The nine Moments include: 3 " \
-                          "Moments from the players that lead in points each day on Friday, Saturday and Sunday; 3 " \
-                          "Moments from the players that lead in rebounds each day on Friday, Saturday and Sunday; 3 " \
-                          "Moments from the players that lead in assists each day on Friday, Saturday and Sunday. " \
-                          "These Moments must be Series 1 or Series 2 Moments. If the player does not have a Series 1 " \
-                          "or Series 2 Moment then you must use their Top Shot Debut. "
-
+    CHALLENGE_CATS = ["ast"]
+    CHALLENGE_NOW = True
+    CHALLENGE_NAME = "### WEEKLY Flash Challenge: 'NO DAYS OFF' "
+    CHALLENGE_DESC_EASY = "On Monday, Feb. 7, you'll need any Moment from the NBA player with the most points.  \n " \
+                          "On Tuesday, Feb. 8, you'll need any Moment from the NBA player with the most points.  \n " \
+                          "On Wednesday, Feb. 9, you'll need any Moment from the NBA player with the most assists.  \n " \
+                          "On **Thursday, Feb. 10**, you'll need any Moment from the NBA player with the most assists.  \n " \
+                          "On Friday, Feb. 11, you'll need any Moment from the NBA player with the most rebounds.  \n " \
+                          "On Saturday, Feb. 12, you'll need any Moment from the NBA player with the most rebound"
+    CHALLENGE_PREV = pd.DataFrame({
+        "date": ["Monday Feb 7", "Tuesday Feb 8", "Wednesday Feb 9"],
+        "category": ["pts", "pts", "ast"],
+        "amount": [38, 44, 11],
+        "name": ["Devin Booker", "Giannis Antetokounmpo", "Dennis Smith Jr"],
+        "team": ["PHX", "MIL", "POR"]
+    }).set_index(['name', 'team'])
     CHALLENGE_DESC_HARD = None
+    CHALLENGE_SEASON_AVG_OPTIONS = None
+    CHALLENGE_ADD_CATEGORIES = None
+    CHALLENGE_SUB_CATEGORIES = None
     CSS_PATH = "frontend/css/streamlit.css"
     DEFAULT_CATS = ["min", "on_court"]
     DEFAULT_STAT_CATS = ["pts", "reb", "ast", "stl", "blk", "tov"]
     FILE_NAME_SAVE = "_NBAStats.csv"
     IMPORT_ADDITIONAL_DAY = False
     LOGO_PATH = "frontend/nba_logo.png"
-    NUM_HIGHLIGHTED = 1
+    CHALLENGE_NUM_HIGHLIGHTED = 1
     PATH_SAVE = "data/prevgamedays/"
     TIEBREAKERS = ["differential", "plus_minus", "min"]
     TS_EASY_CATS = ["easy_moment", "count_easy", "low_ask_easy", "4hchange_easy"]
     TS_HARD_CATS = ["hard_moment", "count_hard", "low_ask_hard", "4hchange_hard"]
-    TOPSHOT_CATEGORIES = TS_EASY_CATS + TS_HARD_CATS
-    TOP_STATS_OVERALL = True
-    TOP_STATS_PER_GAME = False
-    CHALLENGE_LEADERS = pd.Index(["Caris LeVert", "Jarrett Allen", "Luka Doncic", "RJ Barrett", "Anthony Davis",
-                                  "Tyrese Haliburton"])
+    TOPSHOT_CATEGORIES = TS_EASY_CATS  # + TS_HARD_CATS
+    TOP_STATS = "top_overall"  # "first_each", "top_each",
+    CHALLENGE_LEADERS = ["Pascal Siakam", "PJ Washington", "Bam Adebayo", "Spencer Dinwiddie", "Jae Crowder",
+                         "Nikola Vucevic", "Kevon Looney", "Josh Giddey", "Mitchell Robinson", "Hassan Whiteside"]
+    CHALLENGE_LEADERS_TEAMS = ["TOR", "CHA", "MIA", "WSH", "PHX", "CHI", "GSW", "OKC", "NYK", "UTA"]
     LAST_N_GAMES_OPTIONS = ["All", 30, 14, 7]
     DEFAULT_N_GAMES = 14
+    FIRST_TO_THRESHOLD = 5

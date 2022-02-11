@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="icon" href="favicon.png">
+    <title>NBA Live Dashboard</title>
+    <style>
+        html,
+        body {
+            height: 100%
+        }
+
+        body {
+            overflow: hidden;
+            margin: 0;
+        }
+
+        iframe {
+            height: 100%;
+            width: 100%;
+            display: block;
+        }
+
+        iframe:focus {
+            outline: none;
+        }
+
+        iframe[seamless] {
+            display: block;
+        }
+
+    </style>
+</head>
+
+<body>
+<iframe title="Streamlit Web App" src="https://share.streamlit.io/rydr0/nba-live-stat-tracker/main/main.py" width="600"
+        , height="600" ,
+        frameBorder="0">
+    <p>Your browser does not support iframes.</p>
+</iframe>
+</body>
+
+</html>

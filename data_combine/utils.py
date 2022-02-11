@@ -34,6 +34,7 @@ def combine_data(todays_games_df, daily_stats_df, season_stats_df, topshot_data_
     stats_df.reset_index(inplace=True)
     stats_df.rename(columns={"team_nba": "team"}, inplace=True)
     stats_df.set_index(["name", "team"], inplace=True)
+    stats_df.index.names = ["name", "team"]
 
     return stats_df
 
