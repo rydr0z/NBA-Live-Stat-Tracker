@@ -9,7 +9,5 @@ V
 &data_fetchers/injuries/injuryreport.py,4\5\45c5df582829504debce8f3482f662a2114db9d6
 R
 "data_fetchers/todaysgames/utils.py,0\8\08408aecd32b67b41133a3fd08cfc5143b53773e
-@
-topshot_data.csv,4\1\415db1b0b63778965ea2607b17f45165ccdb5ed4
 Q
 !data_fetchers/topshot/__init__.py,0\1\01298d11ee2d27daa20ed80de9e6f8ce839357ad
