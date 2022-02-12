@@ -28,7 +28,7 @@ def create_sidebar(columns, season_avg_columns, len_df):
         challenge_type = st.sidebar.selectbox(
             "Which challenge do you want to view:",
             ["Weekly", "Daily"],
-            ["Weekly", "Daily"].index("Weekly")
+            ["Weekly", "Daily"].index(WebAppParameters.CHALLENGE_TYPE)
         )
     last_n_games = st.sidebar.selectbox(
         "Use season averages from the last __ games",
