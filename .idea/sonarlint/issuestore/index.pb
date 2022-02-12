@@ -17,9 +17,6 @@ W
 'data_fetchers/topshot/topshotfetcher.py,5\b\5b85c65a88076745acf64b8bb35e22a1a0893dcc
 N
 data_fetchers/topshot/utils.py,c\b\cbe011ffff8d3e496e46cfe883a33fa284eb73b4
-:
-
-.gitignore,a\5\a5cc2925ca8258af241be7e5b0381edf30266302
 7
 main.py,f\1\f1bdda93d9a278e358509d498e17d97764c1fb29
 O

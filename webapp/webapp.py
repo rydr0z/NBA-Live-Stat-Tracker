@@ -60,7 +60,7 @@ def run_webapp():
         options_proj = []
     if season_avg_options is not None:
         options = options + season_avg_options
-    sort_by = options[0]
+
     st.title("Game Schedule for {}".format(today_dataset.date))
 
     st.table(
@@ -68,17 +68,16 @@ def run_webapp():
             ["game_status", "away_team", "away_score", "home_team", "home_score"]
         ]
     )
+    sort_by = options[0]
 
     if challenge_type == "Weekly":
         list_top, df_top, sort_by = weekly_challenge(df=df, how_many=how_many, todays_games=todays_games,
                                                      start_times=start_times,
-                                                     today_dataset=today_dataset,
-                                                     sort_by=sort_by, options=options)
+                                                     today_dataset=today_dataset, options=options)
     elif challenge_type == "Daily":
         list_top, df_top, sort_by = daily_challenge(df=df, how_many=how_many, todays_games=todays_games,
                                                     start_times=start_times,
-                                                    today_dataset=today_dataset,
-                                                    sort_by=sort_by, options=options)
+                                                    today_dataset=today_dataset, options=options)
     categories = (
             WebAppParameters.DEFAULT_CATS
             + options

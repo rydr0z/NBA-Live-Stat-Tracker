@@ -5,8 +5,7 @@ from parameters import WeeklyChallengeParameters, DailyChallengeParameters
 from webapp.utils import get_top_stats, get_top_stats_each_game, get_first_to_stats_each_team
 
 
-def weekly_challenge(df=None, how_many=None, todays_games=None, start_times=None, today_dataset=None,
-                     sort_by=None, options=None):
+def weekly_challenge(df=None, how_many=None, todays_games=None, start_times=None, today_dataset=None, options=None):
     if WeeklyChallengeParameters.CHALLENGE_DESC_HARD is not None:
         st.write(WeeklyChallengeParameters.CHALLENGE_DESC_HARD)
 
@@ -14,8 +13,13 @@ def weekly_challenge(df=None, how_many=None, todays_games=None, start_times=None
     st.sidebar.write(WeeklyChallengeParameters.CHALLENGE_DESC_EASY)
 
     list_top = None
-
-    for cat in WeeklyChallengeParameters.CHALLENGE_CATS:
+    if WeeklyChallengeParameters.CHALLENGE_ADD_CATEGORIES is None:
+        challenge_cats = WeeklyChallengeParameters.CHALLENGE_CATS
+        sort_by = challenge_cats[0]
+    else:
+        challenge_cats = ["+".join(WeeklyChallengeParameters.CHALLENGE_ADD_CATEGORIES)]
+        sort_by = challenge_cats[0]
+    for cat in challenge_cats:
         if WeeklyChallengeParameters.TOP_STATS == "top_overall":
             add_to_list = get_top_stats(df, how_many, cat, WeeklyChallengeParameters.TIEBREAKERS)
         elif WeeklyChallengeParameters.TOP_STATS == "top_each":
@@ -31,7 +35,8 @@ def weekly_challenge(df=None, how_many=None, todays_games=None, start_times=None
         sort_by = [sort_by] + WeeklyChallengeParameters.TIEBREAKERS + [sort_by + "_proj"]
     # df_all_challenge = topshot_moments[topshot_moments.index.isin(WeeklyChallengeParameters.CHALLENGE_LEADERS)][
     #    WeeklyChallengeParameters.TOPSHOT_CATEGORIES]
-    df_top = df[df.index.isin(list_top.index)][options + WeeklyChallengeParameters.TOPSHOT_CATEGORIES]
+    df_top = df[df.index.isin(list_top.index)][options + WeeklyChallengeParameters.TOPSHOT_CATEGORIES].sort_values(
+        sort_by[0], ascending=False)
 
     # st.write("### Friday Feb 4 & Saturday Feb 5 Challenge Moments")
     # st.dataframe(df_all_challenge)
@@ -53,8 +58,7 @@ def weekly_challenge(df=None, how_many=None, todays_games=None, start_times=None
     return list_top, df_top, sort_by
 
 
-def daily_challenge(df=None, how_many=None, todays_games=None, start_times=None, today_dataset=None,
-                    sort_by=None, options=None):
+def daily_challenge(df=None, how_many=None, todays_games=None, start_times=None, today_dataset=None, options=None):
     if DailyChallengeParameters.CHALLENGE_DESC_HARD is not None:
         st.write(DailyChallengeParameters.CHALLENGE_DESC_HARD)
 
@@ -63,7 +67,14 @@ def daily_challenge(df=None, how_many=None, todays_games=None, start_times=None,
 
     list_top = None
 
-    for cat in DailyChallengeParameters.CHALLENGE_CATS:
+    if DailyChallengeParameters.CHALLENGE_ADD_CATEGORIES is None:
+        challenge_cats = DailyChallengeParameters.CHALLENGE_CATS
+        sort_by = challenge_cats[0]
+    else:
+        challenge_cats = ["+".join(DailyChallengeParameters.CHALLENGE_ADD_CATEGORIES)]
+        sort_by = challenge_cats[0]
+
+    for cat in challenge_cats:
         if DailyChallengeParameters.TOP_STATS == "top_overall":
             add_to_list = get_top_stats(df, how_many, cat, DailyChallengeParameters.TIEBREAKERS)
         elif DailyChallengeParameters.TOP_STATS == "top_each":
@@ -79,7 +90,8 @@ def daily_challenge(df=None, how_many=None, todays_games=None, start_times=None,
         sort_by = [sort_by] + DailyChallengeParameters.TIEBREAKERS + [sort_by + "_proj"]
     # df_all_challenge = topshot_moments[topshot_moments.index.isin(DailyChallengeParameters.CHALLENGE_LEADERS)][
     #    DailyChallengeParameters.TOPSHOT_CATEGORIES]
-    df_top = df[df.index.isin(list_top.index)][options + DailyChallengeParameters.TOPSHOT_CATEGORIES]
+    df_top = df[df.index.isin(list_top.index)][options + DailyChallengeParameters.TOPSHOT_CATEGORIES].sort_values(
+        sort_by[0], ascending=False)
 
     # st.write("### Friday Feb 4 & Saturday Feb 5 Challenge Moments")
     # st.dataframe(df_all_challenge)
