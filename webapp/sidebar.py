@@ -8,14 +8,17 @@ def set_defaults(challenge, challenge_type):
         if challenge_type == "Weekly":
             stat_categories = WeeklyChallengeParameters.CHALLENGE_CATS
             tiebreakers = WeeklyChallengeParameters.TIEBREAKERS
+            top_stat = WeeklyChallengeParameters.TOP_STATS
         elif challenge_type == "Daily":
             stat_categories = DailyChallengeParameters.CHALLENGE_CATS
             tiebreakers = DailyChallengeParameters.TIEBREAKERS
+            top_stat = WeeklyChallengeParameters.TOP_STATS
     else:
         stat_categories = WebAppParameters.DEFAULT_STAT_CATS
         tiebreakers = WebAppParameters.TIEBREAKERS
+        top_stat = None
 
-    return stat_categories, tiebreakers
+    return stat_categories, tiebreakers, top_stat
 
 
 def create_sidebar(columns, season_avg_columns, len_df):
@@ -40,7 +43,7 @@ def create_sidebar(columns, season_avg_columns, len_df):
     if last_n_games == "All":
         last_n_games = 0
 
-    stat_categories, tiebreakers = set_defaults(challenge, challenge_type)
+    stat_categories, tiebreakers, top_stat = set_defaults(challenge, challenge_type)
 
     if not challenge:
         options = st.sidebar.multiselect(
