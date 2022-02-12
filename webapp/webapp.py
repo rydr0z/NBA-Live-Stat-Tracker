@@ -4,9 +4,10 @@ from streamlit_autorefresh import st_autorefresh
 
 from data_combine.combinedata import CombinedStats
 from parameters import WebAppParameters
+from webapp.challenge import weekly_challenge, daily_challenge
 from webapp.sidebar import create_sidebar
-from webapp.utils import get_top_stats, get_top_stats_each_game, bg_color, add_subtract_stat, run_projections, \
-    save_dataframe, get_first_to_stats_each_team
+from webapp.utils import bg_color, add_subtract_stat, run_projections, \
+    save_dataframe
 
 
 def run_webapp():
@@ -38,9 +39,10 @@ def run_webapp():
     season_avg_columns = [x + "_avg" for x in columns if x + "_avg" in columns]
     columns = [x for x in columns if x + "_avg" in columns]
 
-    options, season_avg_options, add_categories, sub_categories, how_many, challenge = create_sidebar(columns,
-                                                                                                      season_avg_columns,
-                                                                                                      len_df)
+    options, season_avg_options, add_categories, sub_categories, how_many, tiebreakers, challenge, challenge_type = create_sidebar(
+        columns,
+        season_avg_columns,
+        len_df)
     options, options_proj = run_projections(
         df, options, add_categories, sub_categories
     )
@@ -58,14 +60,6 @@ def run_webapp():
         options_proj = []
     if season_avg_options is not None:
         options = options + season_avg_options
-    categories = (
-            WebAppParameters.DEFAULT_CATS
-            + options
-            + options_proj
-            + [x for x in WebAppParameters.TIEBREAKERS if x != "min"]
-            + WebAppParameters.TOPSHOT_CATEGORIES
-    )
-
     sort_by = options[0]
     st.title("Game Schedule for {}".format(today_dataset.date))
 
@@ -75,55 +69,28 @@ def run_webapp():
         ]
     )
 
-    if WebAppParameters.CHALLENGE_DESC_HARD is not None:
-        st.write(WebAppParameters.CHALLENGE_DESC_HARD)
-    for stat in multi_day_stat_list:
-        st.write("*{} represent all stats accumulated since {}".format(
-            stat, today_dataset.date_prev
-        ))
+    if challenge_type == "Weekly":
+        list_top, df_top, sort_by = weekly_challenge(df=df, how_many=how_many, todays_games=todays_games,
+                                                     start_times=start_times,
+                                                     today_dataset=today_dataset,
+                                                     sort_by=sort_by, options=options)
+    elif challenge_type == "Daily":
+        list_top, df_top, sort_by = daily_challenge(df=df, how_many=how_many, todays_games=todays_games,
+                                                    start_times=start_times,
+                                                    today_dataset=today_dataset,
+                                                    sort_by=sort_by, options=options)
+    categories = (
+            WebAppParameters.DEFAULT_CATS
+            + options
+            + options_proj
+            + [x for x in WebAppParameters.TIEBREAKERS if x != "min"]
+            + WebAppParameters.TOPSHOT_CATEGORIES
+    )
 
     df_styler = df.style.set_properties(**{"text-align": "center"})
     df_styler.set_table_styles(
         [dict(selector="th", props=[("text-align", "center")])]
     )
-
-    if challenge:
-        list_top = None
-
-        for cat in WebAppParameters.CHALLENGE_CATS:
-            if WebAppParameters.TOP_STATS == "top_overall":
-                add_to_list = get_top_stats(df, how_many, cat, WebAppParameters.TIEBREAKERS)
-            elif WebAppParameters.TOP_STATS == "top_each":
-                add_to_list = get_top_stats_each_game(df, todays_games, cat, WebAppParameters.TIEBREAKERS)
-            elif WebAppParameters.TOP_STATS == "first_each":
-                add_to_list = get_first_to_stats_each_team(df, todays_games, cat, WebAppParameters.FIRST_TO_THRESHOLD)
-            list_top = pd.concat([list_top, add_to_list])
-
-        if start_times[0] < today_dataset.now:
-            sort_by = [sort_by] + WebAppParameters.TIEBREAKERS
-        else:
-            sort_by = [sort_by] + WebAppParameters.TIEBREAKERS + [sort_by + "_proj"]
-        # df_all_challenge = topshot_moments[topshot_moments.index.isin(WebAppParameters.CHALLENGE_LEADERS)][
-        #    WebAppParameters.TOPSHOT_CATEGORIES]
-        df_top = df[df.index.isin(list_top.index)][options + WebAppParameters.TOPSHOT_CATEGORIES]
-
-        # st.write("### Friday Feb 4 & Saturday Feb 5 Challenge Moments")
-        # st.dataframe(df_all_challenge)
-        st.write("### Previous Day Challenge Leaders")
-        st.dataframe(WebAppParameters.CHALLENGE_PREV)
-        st.write("### Today's Challenge Leaders")
-        if start_times[0] < today_dataset.now:
-            st.dataframe(df_top)
-        else:
-            st.write("Today's games have not started yet.")
-
-    st.title("Complete Leaderboard")
-    st.write("**Projections are calculated as:**  \n" \
-             "*live stat + ( stat average over games specified in sidebar \* mins remaining in game )*  \n" \
-             "*OT periods add an additional 5 minutes to time remaining in game and projection is adjusted if OT is reached.  \n" \
-             "Players with INJ or OUT injury status are projected 0 in all statistics."
-             )
-
     df = df.sort_values(sort_by, ascending=False)[categories]
     # Options for Pandas DataFrame Style
     if count % 1 == 0 or count == 0:
