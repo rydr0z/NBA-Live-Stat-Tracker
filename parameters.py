@@ -310,46 +310,71 @@ class TopShotParameters:
     URL = "https://otmnft.com/create_moments_csv/?playerName=&setName=&team=&minprice=&maxprice=&mincirc=&maxcirc=&sortby="
 
 
-class WebAppParameters:
-    AUTO_REFRESH_INTERVAL = 60000  # 1 minute
-    AUTO_REFRESH_LIMIT = 120
-    ADDITIONAL_DAY_PATH = "prevgamedays/2022-01-2122_NBAStats_edited.csv"
-    CHALLENGE_CATS = ["ast"]
-    CHALLENGE_NOW = True
+class WeeklyChallengeParameters:
+    CHALLENGE_CATS = ["reb"]
     CHALLENGE_NAME = "### WEEKLY Flash Challenge: 'NO DAYS OFF' "
     CHALLENGE_DESC_EASY = "On Monday, Feb. 7, you'll need any Moment from the NBA player with the most points.  \n " \
                           "On Tuesday, Feb. 8, you'll need any Moment from the NBA player with the most points.  \n " \
                           "On Wednesday, Feb. 9, you'll need any Moment from the NBA player with the most assists.  \n " \
-                          "On **Thursday, Feb. 10**, you'll need any Moment from the NBA player with the most assists.  \n " \
-                          "On Friday, Feb. 11, you'll need any Moment from the NBA player with the most rebounds.  \n " \
+                          "On Thursday, Feb. 10, you'll need any Moment from the NBA player with the most assists.  \n " \
+                          "On **Friday, Feb. 11**, you'll need any Moment from the NBA player with the most rebounds.  \n " \
                           "On Saturday, Feb. 12, you'll need any Moment from the NBA player with the most rebound"
     CHALLENGE_PREV = pd.DataFrame({
-        "date": ["Monday Feb 7", "Tuesday Feb 8", "Wednesday Feb 9"],
-        "category": ["pts", "pts", "ast"],
-        "amount": [38, 44, 11],
-        "name": ["Devin Booker", "Giannis Antetokounmpo", "Dennis Smith Jr"],
-        "team": ["PHX", "MIL", "POR"]
+        "date": ["Monday Feb 7", "Tuesday Feb 8", "Wednesday Feb 9", "Thursday Feb 10"],
+        "category": ["pts", "pts", "ast", "ast"],
+        "amount": [38, 44, 11, 19],
+        "name": ["Devin Booker", "Giannis Antetokounmpo", "Dennis Smith Jr", "Chris Paul"],
+        "team": ["PHX", "MIL", "POR", "PHX"]
     }).set_index(['name', 'team'])
+    CHALLENGE_ADD_CATEGORIES = None
     CHALLENGE_DESC_HARD = None
     CHALLENGE_SEASON_AVG_OPTIONS = None
-    CHALLENGE_ADD_CATEGORIES = None
     CHALLENGE_SUB_CATEGORIES = None
+    CHALLENGE_NUM_HIGHLIGHTED = 1
+    TOP_STATS = "top_overall"  # "first_each", "top_each",
+    TIEBREAKERS = ["differential", "plus_minus", "min"]
+    TS_EASY_CATS = ["easy_moment", "count_easy", "low_ask_easy", "4hchange_easy"]
+    TS_HARD_CATS = ["hard_moment", "count_hard", "low_ask_hard", "4hchange_hard"]
+    TOPSHOT_CATEGORIES = TS_EASY_CATS  # + TS_HARD_CATS
+
+
+class DailyChallengeParameters:
+    CHALLENGE_CATS = ["pts", "reb", "ast", "blk", "stl"]
+    CHALLENGE_NAME = "### Weekend Flash Challenge: 'ADD IT UP' "
+    CHALLENGE_DESC_EASY = "To earn the Challenge Reward, create a Challenge Entry featuring the top five players " \
+                          "with the most combined total Points, Rebounds, Assists, Blocks and Steals in a single" \
+                          " game during NBA games from Feb. 11-13, 2022, to earn a Julius Randle Metallic Silver" \
+                          " FE Moment™ NFT."
+    CHALLENGE_PREV = None
+    CHALLENGE_ADD_CATEGORIES = CHALLENGE_CATS
+    CHALLENGE_DESC_HARD = None
+    CHALLENGE_SEASON_AVG_OPTIONS = None
+    CHALLENGE_SUB_CATEGORIES = None
+    CHALLENGE_NUM_HIGHLIGHTED = 5
+    TOP_STATS = "top_overall"  # "first_each", "top_each",
+    TIEBREAKERS = ["differential", "plus_minus", "min"]
+    TS_EASY_CATS = ["easy_moment", "count_easy", "low_ask_easy", "4hchange_easy"]
+    TS_HARD_CATS = ["hard_moment", "count_hard", "low_ask_hard", "4hchange_hard"]
+    TOPSHOT_CATEGORIES = TS_EASY_CATS  # + TS_HARD_CATS
+
+
+class WebAppParameters:
+    ADDITIONAL_DAY_PATH = "prevgamedays/2022-01-2122_NBAStats_edited.csv"
+    AUTO_REFRESH_INTERVAL = 60000  # 1 minute
+    AUTO_REFRESH_LIMIT = 120
+    CHALLENGE_NOW = True
+    CHALLENGE_TYPE = "Daily"
     CSS_PATH = "frontend/css/streamlit.css"
     DEFAULT_CATS = ["min", "on_court"]
+    DEFAULT_N_GAMES = 14
     DEFAULT_STAT_CATS = ["pts", "reb", "ast", "stl", "blk", "tov"]
     FILE_NAME_SAVE = "_NBAStats.csv"
+    FIRST_TO_THRESHOLD = 5
     IMPORT_ADDITIONAL_DAY = False
+    LAST_N_GAMES_OPTIONS = ["All", 30, 14, 7]
     LOGO_PATH = "frontend/nba_logo.png"
-    CHALLENGE_NUM_HIGHLIGHTED = 1
     PATH_SAVE = "data/prevgamedays/"
     TIEBREAKERS = ["differential", "plus_minus", "min"]
     TS_EASY_CATS = ["easy_moment", "count_easy", "low_ask_easy", "4hchange_easy"]
     TS_HARD_CATS = ["hard_moment", "count_hard", "low_ask_hard", "4hchange_hard"]
     TOPSHOT_CATEGORIES = TS_EASY_CATS  # + TS_HARD_CATS
-    TOP_STATS = "top_overall"  # "first_each", "top_each",
-    CHALLENGE_LEADERS = ["Pascal Siakam", "PJ Washington", "Bam Adebayo", "Spencer Dinwiddie", "Jae Crowder",
-                         "Nikola Vucevic", "Kevon Looney", "Josh Giddey", "Mitchell Robinson", "Hassan Whiteside"]
-    CHALLENGE_LEADERS_TEAMS = ["TOR", "CHA", "MIA", "WSH", "PHX", "CHI", "GSW", "OKC", "NYK", "UTA"]
-    LAST_N_GAMES_OPTIONS = ["All", 30, 14, 7]
-    DEFAULT_N_GAMES = 14
-    FIRST_TO_THRESHOLD = 5
