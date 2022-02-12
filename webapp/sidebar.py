@@ -24,6 +24,7 @@ def create_sidebar(columns, season_avg_columns, len_df):
     challenge = st.sidebar.checkbox(
         "Check here to view current NBA Top Shot challenge", value=WebAppParameters.CHALLENGE_NOW
     )
+    challenge_type = None
     if challenge:
         challenge_type = st.sidebar.selectbox(
             "Which challenge do you want to view:",
