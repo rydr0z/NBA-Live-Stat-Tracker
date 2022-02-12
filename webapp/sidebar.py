@@ -13,6 +13,7 @@ def set_defaults(challenge, challenge_type):
             tiebreakers = DailyChallengeParameters.TIEBREAKERS
     else:
         stat_categories = WebAppParameters.DEFAULT_STAT_CATS
+        tiebreakers = WebAppParameters.TIEBREAKERS
 
     return stat_categories, tiebreakers
 
