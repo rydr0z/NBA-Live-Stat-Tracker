@@ -55,6 +55,7 @@ def weekly_challenge(df=None, how_many=None, todays_games=None, start_times=None
     df_top = df[df.index.isin(list_top.index)][[options[0]] + ["on_court", "differential",
                                                                "plus_minus"] + WeeklyChallengeParameters.TOPSHOT_CATEGORIES].sort_values(
         sort_by[0], ascending=False)
+    list_top = df_top
 
     st.write("### Friday Feb 4 & Saturday Feb 5 Challenge Moments")
     if WeeklyChallengeParameters.CHALLENGE_PREV is not None:
@@ -113,6 +114,7 @@ def daily_challenge(df=None, how_many=None, todays_games=None, start_times=None,
 
     df_top = combine_top_prev_and_today(df_top, sort_by[0], df_top_prev=DailyChallengeParameters.CHALLENGE_PREV,
                                         topshot_data_df=topshot_data_df)
+    list_top = df_top
 
     st.write("### Today's Challenge Leaders")
     st.write("For multiday Challenges - Any previous day's leaders are included.")

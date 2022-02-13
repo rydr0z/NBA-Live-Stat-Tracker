@@ -80,7 +80,6 @@ def run_webapp():
                                                     today_dataset=today_dataset, options=options,
                                                     topshot_data_df=today_dataset.topshot_data_df)
 
-    list_top = df_top
     categories = (
             WebAppParameters.DEFAULT_CATS
             + options
