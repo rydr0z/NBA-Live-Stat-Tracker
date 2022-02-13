@@ -317,14 +317,15 @@ class WeeklyChallengeParameters:
                           "On Tuesday, Feb. 8, you'll need any Moment from the NBA player with the most points.  \n " \
                           "On Wednesday, Feb. 9, you'll need any Moment from the NBA player with the most assists.  \n " \
                           "On Thursday, Feb. 10, you'll need any Moment from the NBA player with the most assists.  \n " \
-                          "On **Friday, Feb. 11**, you'll need any Moment from the NBA player with the most rebounds.  \n " \
-                          "On Saturday, Feb. 12, you'll need any Moment from the NBA player with the most rebound"
+                          "On Friday, Feb. 11, you'll need any Moment from the NBA player with the most rebounds.  \n " \
+                          "On **Saturday, Feb. 12**, you'll need any Moment from the NBA player with the most rebounds.  \n " \
+                          "On Sunday, Feb. 13, you'll need any Moment from the NBA player with the most three-pointers made."
     CHALLENGE_PREV = pd.DataFrame({
-        "date": ["Monday Feb 7", "Tuesday Feb 8", "Wednesday Feb 9", "Thursday Feb 10"],
-        "category": ["pts", "pts", "ast", "ast"],
-        "amount": [38, 44, 11, 19],
-        "name": ["Devin Booker", "Giannis Antetokounmpo", "Dennis Smith Jr", "Chris Paul"],
-        "team": ["PHX", "MIL", "POR", "PHX"]
+        "date": ["Monday Feb 7", "Tuesday Feb 8", "Wednesday Feb 9", "Thursday Feb 10", "Friday Feb 10"],
+        "category": ["pts", "pts", "ast", "ast", "reb"],
+        "amount": [38, 44, 11, 19, 19],
+        "name": ["Devin Booker", "Giannis Antetokounmpo", "Dennis Smith Jr", "Chris Paul", "Joel Embiid"],
+        "team": ["PHX", "MIL", "POR", "PHX", "PHI"]
     }).set_index(['name', 'team'])
     CHALLENGE_ADD_CATEGORIES = None
     CHALLENGE_DESC_HARD = None
@@ -345,7 +346,13 @@ class DailyChallengeParameters:
                           "with the most combined total Points, Rebounds, Assists, Blocks and Steals in a single" \
                           " game during NBA games from Feb. 11-13, 2022, to earn a Julius Randle Metallic Silver" \
                           " FE Moment™ NFT."
-    CHALLENGE_PREV = None
+    CHALLENGE_PREV = pd.DataFrame({
+        "pts+reb+ast+blk+stl": [61.0, 54.0, 52.0, 52.0, 50.0],
+        "on_court": ["GP 02/11"] * 5,
+        "differential": [15, 13, 22, -6, 22],
+        "plus_minus": [33, 14, 16, 3, 20],
+        "name": ["Dejounte Murray", "Joel Embiid", "LaMelo Ball", "Nikola Jokic", "Terry Rozier"],
+        "team": ["SAS", "PHI", "CHA", "DEN", "CHA"]}).set_index("name")
     CHALLENGE_ADD_CATEGORIES = CHALLENGE_CATS
     CHALLENGE_DESC_HARD = None
     CHALLENGE_SEASON_AVG_OPTIONS = None

@@ -5,6 +5,24 @@ from parameters import WeeklyChallengeParameters, DailyChallengeParameters
 from webapp.utils import get_top_stats, get_top_stats_each_game, get_first_to_stats_each_team
 
 
+def combine_top_prev_and_today(df_top_today, stat, df_top_prev=None, topshot_data_df=None):
+    if df_top_prev is not None:
+        df_top_prev = df_top_prev.join(topshot_data_df, how="left", on="name", lsuffix="",
+                                       rsuffix="_TS").reset_index().set_index(
+            ["name", "team"])
+        df_top_prev.index = df_top_prev.index.set_levels(df_top_prev.index.levels[0] + " - 02/11", level=0)
+        df_top = df_top_today.merge(df_top_prev, how="outer",
+                                    on=["name", "team", stat, "differential",
+                                        "plus_minus"] + DailyChallengeParameters.TOPSHOT_CATEGORIES)
+        df_top = df_top.sort_values(stat, ascending=False)[:len(df_top_today)][
+            [stat, "differential",
+             "plus_minus"] + DailyChallengeParameters.TOPSHOT_CATEGORIES]
+    else:
+        df_top = df_top_today
+
+    return df_top
+
+
 def weekly_challenge(df=None, how_many=None, todays_games=None, start_times=None, today_dataset=None, options=None):
     if WeeklyChallengeParameters.CHALLENGE_DESC_HARD is not None:
         st.write(WeeklyChallengeParameters.CHALLENGE_DESC_HARD)
@@ -33,13 +51,12 @@ def weekly_challenge(df=None, how_many=None, todays_games=None, start_times=None
         sort_by = [sort_by] + WeeklyChallengeParameters.TIEBREAKERS
     else:
         sort_by = [sort_by] + WeeklyChallengeParameters.TIEBREAKERS + [sort_by + "_proj"]
-    # df_all_challenge = topshot_moments[topshot_moments.index.isin(WeeklyChallengeParameters.CHALLENGE_LEADERS)][
-    #    WeeklyChallengeParameters.TOPSHOT_CATEGORIES]
-    df_top = df[df.index.isin(list_top.index)][options + WeeklyChallengeParameters.TOPSHOT_CATEGORIES].sort_values(
+
+    df_top = df[df.index.isin(list_top.index)][[options[0]] + ["on_court", "differential",
+                                                               "plus_minus"] + WeeklyChallengeParameters.TOPSHOT_CATEGORIES].sort_values(
         sort_by[0], ascending=False)
 
-    # st.write("### Friday Feb 4 & Saturday Feb 5 Challenge Moments")
-    # st.dataframe(df_all_challenge)
+    st.write("### Friday Feb 4 & Saturday Feb 5 Challenge Moments")
     if WeeklyChallengeParameters.CHALLENGE_PREV is not None:
         st.write("### Previous Day Challenge Leaders")
         st.dataframe(WeeklyChallengeParameters.CHALLENGE_PREV)
@@ -58,7 +75,8 @@ def weekly_challenge(df=None, how_many=None, todays_games=None, start_times=None
     return list_top, df_top, sort_by
 
 
-def daily_challenge(df=None, how_many=None, todays_games=None, start_times=None, today_dataset=None, options=None):
+def daily_challenge(df=None, how_many=None, todays_games=None, start_times=None, today_dataset=None, options=None,
+                    topshot_data_df=None):
     if DailyChallengeParameters.CHALLENGE_DESC_HARD is not None:
         st.write(DailyChallengeParameters.CHALLENGE_DESC_HARD)
 
@@ -88,17 +106,16 @@ def daily_challenge(df=None, how_many=None, todays_games=None, start_times=None,
         sort_by = [sort_by] + DailyChallengeParameters.TIEBREAKERS
     else:
         sort_by = [sort_by] + DailyChallengeParameters.TIEBREAKERS + [sort_by + "_proj"]
-    # df_all_challenge = topshot_moments[topshot_moments.index.isin(DailyChallengeParameters.CHALLENGE_LEADERS)][
-    #    DailyChallengeParameters.TOPSHOT_CATEGORIES]
-    df_top = df[df.index.isin(list_top.index)][options + DailyChallengeParameters.TOPSHOT_CATEGORIES].sort_values(
+
+    df_top = df[df.index.isin(list_top.index)][[options[0]] + ["on_court", "differential",
+                                                               "plus_minus"] + DailyChallengeParameters.TOPSHOT_CATEGORIES].sort_values(
         sort_by[0], ascending=False)
 
-    # st.write("### Friday Feb 4 & Saturday Feb 5 Challenge Moments")
-    # st.dataframe(df_all_challenge)
-    if DailyChallengeParameters.CHALLENGE_PREV is not None:
-        st.write("### Previous Day Challenge Leaders")
-        st.dataframe(DailyChallengeParameters.CHALLENGE_PREV)
+    df_top = combine_top_prev_and_today(df_top, sort_by[0], df_top_prev=DailyChallengeParameters.CHALLENGE_PREV,
+                                        topshot_data_df=topshot_data_df)
+
     st.write("### Today's Challenge Leaders")
+    st.write("For multiday Challenges - Any previous day's leaders are included.")
     if start_times[0] < today_dataset.now:
         st.dataframe(df_top)
     else:

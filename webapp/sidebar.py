@@ -4,7 +4,11 @@ from parameters import WebAppParameters, WeeklyChallengeParameters, DailyChallen
 
 
 def set_defaults(challenge, challenge_type):
-    if challenge:
+    if not challenge:
+        stat_categories = WebAppParameters.DEFAULT_STAT_CATS
+        tiebreakers = WebAppParameters.TIEBREAKERS
+        top_stat = None
+    else:
         if challenge_type == "Weekly":
             stat_categories = WeeklyChallengeParameters.CHALLENGE_CATS
             tiebreakers = WeeklyChallengeParameters.TIEBREAKERS
@@ -13,10 +17,6 @@ def set_defaults(challenge, challenge_type):
             stat_categories = DailyChallengeParameters.CHALLENGE_CATS
             tiebreakers = DailyChallengeParameters.TIEBREAKERS
             top_stat = WeeklyChallengeParameters.TOP_STATS
-    else:
-        stat_categories = WebAppParameters.DEFAULT_STAT_CATS
-        tiebreakers = WebAppParameters.TIEBREAKERS
-        top_stat = None
 
     return stat_categories, tiebreakers, top_stat
 
@@ -26,7 +26,7 @@ def create_sidebar(columns, season_avg_columns, len_df):
     st.sidebar.button("Click Here to Refresh Live Data")
 
     challenge = st.sidebar.checkbox(
-        "Check here to view current NBA Top Shot challenge", value=WebAppParameters.CHALLENGE_NOW
+        "Check here to view current NBA Top Shot challenge(s)", value=WebAppParameters.CHALLENGE_NOW
     )
     challenge_type = None
     if challenge:
@@ -62,7 +62,7 @@ def create_sidebar(columns, season_avg_columns, len_df):
             "Do you want to subtract any categories? Categories are subtracted from the first listed",
             columns,
         )
-        if WebAppParameters.TOP_STATS == "top_overall":
+        if top_stat == "top_overall":
             how_many = st.sidebar.slider(
                 "Highlight the top __ players in sorted categories",
                 min_value=0,

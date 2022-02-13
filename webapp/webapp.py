@@ -77,7 +77,10 @@ def run_webapp():
     elif challenge_type == "Daily":
         list_top, df_top, sort_by = daily_challenge(df=df, how_many=how_many, todays_games=todays_games,
                                                     start_times=start_times,
-                                                    today_dataset=today_dataset, options=options)
+                                                    today_dataset=today_dataset, options=options,
+                                                    topshot_data_df=today_dataset.topshot_data_df)
+
+    list_top = df_top
     categories = (
             WebAppParameters.DEFAULT_CATS
             + options
