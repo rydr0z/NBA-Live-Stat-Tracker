@@ -369,7 +369,7 @@ class WebAppParameters:
     ADDITIONAL_DAY_PATH = "prevgamedays/2022-01-2122_NBAStats_edited.csv"
     AUTO_REFRESH_INTERVAL = 60000  # 1 minute
     AUTO_REFRESH_LIMIT = 120
-    CHALLENGE_NOW = True
+    CHALLENGE_NOW = False
     CHALLENGE_TYPE = "Daily"
     CSS_PATH = "frontend/css/streamlit.css"
     DEFAULT_CATS = ["min", "on_court"]

@@ -1,14 +1,8 @@
 
 R
 "data_fetchers/injuries/__init__.py,4\5\45a13f96decfda2653b54793e571815f639836bd
-U
-%data_fetchers/live/livestatfetcher.py,b\3\b34942a3d303bb18818660de2178f009d236483b
-_
-/data_fetchers/todaysgames/todaysgamesfetcher.py,0\9\0907f1d8f0a381de875948749fd6b778ea79119e
 V
 &data_fetchers/injuries/injuryreport.py,4\5\45c5df582829504debce8f3482f662a2114db9d6
-R
-"data_fetchers/todaysgames/utils.py,0\8\08408aecd32b67b41133a3fd08cfc5143b53773e
 Q
 !data_fetchers/topshot/__init__.py,0\1\01298d11ee2d27daa20ed80de9e6f8ce839357ad
 @
@@ -17,15 +11,9 @@ W
 'data_fetchers/topshot/topshotfetcher.py,5\b\5b85c65a88076745acf64b8bb35e22a1a0893dcc
 N
 data_fetchers/topshot/utils.py,c\b\cbe011ffff8d3e496e46cfe883a33fa284eb73b4
-7
-main.py,f\1\f1bdda93d9a278e358509d498e17d97764c1fb29
 O
 data_fetchers/injuries/utils.py,1\e\1e2a2b8824f52491296e7951b85d98cf29224bc1
 a
 1frontend/webpage/.firebase/hosting.cHVibGlj.cache,6\f\6f36bac8dd22005fbcca47c8de9a428ab4d27456
 9
 	README.md,8\e\8ec9a00bfd09b3190ac6b22251dbb1aa95a0579d
-K
-data_fetchers/live/utils.py,0\c\0c3669b2b6459830b200772388b36fed22d9aa6d
-Y
-)data_fetchers/season/seasonstatfetcher.py,f\5\f5acf35edcdb54dadde48d4f442ad8107365c4de

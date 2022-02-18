@@ -12,6 +12,7 @@ def get_todays_games():
     # request today's live scoreboard and get the games
     board = scoreboard.ScoreBoard()
     games = board.games.get_dict()
+    print(games)
 
     # initialize dataframe and list to fetched data
     todays_games = pd.DataFrame(columns=TodayParameters.DEFAULT_COLS)
