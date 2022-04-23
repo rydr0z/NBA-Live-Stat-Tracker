@@ -307,7 +307,7 @@ class TopShotParameters:
     }
     TSD_BACKUP_EASY = True
     TSD_BACKUP_HARD = False
-    URL = "https://otmnft.com/create_moments_csv/?playerName=&setName=&team=&minprice=&maxprice=&mincirc=&maxcirc=&sortby="
+    URL = "https://otmnftapi.com/nbatopshot/create_moments_csv/?user=rydr&"
 
 
 class WeeklyChallengeParameters:
